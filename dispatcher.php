@@ -207,6 +207,7 @@ elseif(isset($_POST['viewHome']))
 	<center>
 		<div style="padding-top: 50px;">
 			<?php
+				echo date("Y-m-d H:i:s", strtotime('+5 hours'));
 			$cartotal = 0;
 			include 'data.php';
 			$reservedquery=mysqli_query($con,"SELECT * FROM vehicle_database WHERE Status='Reserved'");

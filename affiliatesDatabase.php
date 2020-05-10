@@ -33,7 +33,12 @@
 		?>
 		</form>
 		<td align="right" bgcolor='#d3d3d3'>
-			<button class="button button5" id="showModal">Add Affiliate</button>
+		<?php
+			if($_SESSION['Accounttype']=="Manager")
+			{
+				echo "<button class='button button5' id='showModal'>Add Affiliate</button>";
+			}
+			?>
 		</td>
 	</tr>
 </table>
