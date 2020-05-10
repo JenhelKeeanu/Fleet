@@ -68,7 +68,7 @@ while($showVehicle = mysqli_fetch_array($vehicleView))
 			<tr>";
 				if($_SESSION['Accounttype']!="Quality Controller")
 				{
-					if(!isset($_POST['updateVehicle'])) echo "<td bgcolor='white'><input type='submit' name='updateVehicle' class='button button5' value='Update'></td>";
+					if(!isset($_POST['updateVehicle'])) echo "<td bgcolor='white'><input type='submit' name='updateVehicle' class='button button5' value='Edit'></td>";
 					else echo "<td bgcolor='white'><input type='submit' name='saveVehicle' class='button button5' value='Save'></td>";
 				}
 				echo "
