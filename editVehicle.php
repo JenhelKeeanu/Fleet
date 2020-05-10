@@ -31,7 +31,7 @@ while($showVehicle = mysqli_fetch_array($vehicleView))
 			<tr>
 				<td bgcolor='white'><b>Status:</b></td>
 				<td bgcolor='white'>";
-				if(!isset($_POST['updateVehicle'])) echo "<input type='text' value='{$showVehicle['Status']}'>";
+				if(!isset($_POST['updateVehicle'])) echo "<input type='text' value='{$showVehicle['Status']}' READONLY>";
 				else
 				{
 					echo "

@@ -87,8 +87,24 @@ elseif(isset($_POST['updateAccount']))
 	include "data.php";
 	$updateArecord = mysqli_query($con,"SELECT * FROM users_database WHERE Username = '". $_POST['updateUsername'] ."'");
 	$nUpdate = mysqli_num_rows($updateArecord);
+	
 	if($nUpdate>0)
 	{
+		while($rdetails = mysqli_fetch_array($updateArecord))
+		{
+			$_SESSION['detailsID'] = $rdetails['User_ID'];
+			$detailsID = $rdetails['User_ID'];
+			$detailsFirst = $rdetails['First_Name'];
+			$detailsMiddle = $rdetails['Middle_Name'];
+			$detailsLast = $rdetails['Last_Name'];
+			$detailsContact = $rdetails['Contact_No'];
+			$detailsBirth = $rdetails['Birthday'];
+			$detailsEmail = $rdetails['Email'];
+			$detailsType = $rdetails['Account_Type'];
+			$detailsAddress = $rdetails['Address'];
+			$detailsUsername = $rdetails['Username'];
+			$detailsPassword = $rdetails['Password'];
+		}
 		if($detailsUsername == $_POST['updateUsername'])
 		{
 			$updated = mysqli_query($con,"UPDATE users_database SET 
