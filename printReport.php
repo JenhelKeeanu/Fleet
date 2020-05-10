@@ -12,6 +12,7 @@ $vehicle = $_SESSION['print_vehicle'];
 $pdf = new FPDF();
 $pdf->AddPage('L','A4');
 $pdf->SetFont('Arial','B',16);
+$pdf-> Image('logo.png',20,0,60,35);
 $pdf->MultiCell(0,10,'Vehicle Report',0,'C');
 $pdf->MultiCell(0,10,$dateToday,0,'R');
 $pdf->SetFont('Arial','B',11);
@@ -35,6 +36,11 @@ if (!$vehicles_rep) {
         if($loopCount==0||$lastPlate!=$veh['Plate_No']){
             if($lastPlate!=$veh['Plate_No']&&$loopCount!=0){
                 $pdf->AddPage('L','A4');
+                $pdf->SetFont('Arial','B',16);
+                $pdf-> Image('logo.png',20,0,60,35);
+                $pdf->MultiCell(0,10,'Vehicle Report',0,'C');
+                $pdf->MultiCell(0,10,$dateToday,0,'R');
+                $pdf->SetFont('Arial','B',11);
                 // $toBeAppend=$toBeAppend."</tbody></table><br><hr><br>";
             }
             $pdf->Ln(15);

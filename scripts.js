@@ -31,6 +31,7 @@ $("#generate_report").on('click',function(){
 		if(reportType=="vehicleVrr"&&vehicle!=0){
 			xmlhttp.onreadystatechange = function() {
 				if (this.readyState == 4 && this.status == 200) {
+					$("#txtHint").empty()
 					$("#txtHint").append(this.responseText)
 				}
 			};
