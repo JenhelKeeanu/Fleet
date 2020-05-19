@@ -9,13 +9,8 @@ elseif(isset($_POST['saveAffiliate']))
 	if($nAfind>0) echo "<script>alert('Record not saved. Account already exist in database.');</script>";
 	else
 	{
-		
-		if (mysqli_query($con, "INSERT INTO users_database (Username,Password,First_Name,Middle_Name,Last_Name,Contact_No,Birthday,Account_Type,Email,Address) VALUES ('". $_POST['addAuser'] ."','". $_POST['addAuser'] ."',' ',' ',' ','". $_POST['addAcontact'] ."',now(),'Affiliate','". $_POST['addAemail'] ."','". $_POST['addAaddress'] ."')")) {
-			$last_id = mysqli_insert_id($con);
-			$addArecord = mysqli_query($con, "INSERT INTO affiliates_database (Affiliates_Name,Branch,affiliate_user) VALUES ('". $_POST['addAname'] ."','". $_POST['addAbranch'] ."',". $last_id .")");
-			echo "<script>alert('Account successfully saved.');window.location.href='manager.php?affil=1';</script>";
-		} else {
-		}
+		$addArecord = mysqli_query($con,"INSERT INTO affiliates_database (Affiliates_Name,Branch) VALUES ('". $_POST['addAname'] ."','". $_POST['addAbranch'] ."')");
+		echo "<script>alert('Account successfully saved.');window.location.href='manager.php?affil=1';</script>";
 	}
 }
 elseif(isset($_POST['updateAffil']))
@@ -542,7 +537,7 @@ elseif(isset($_POST['logout']))
 elseif(isset($_POST['viewHome']))
 {
 	$_SESSION['updateCounter'] = 0;
-	echo "<script>window.location.href='manager.php';</script>";
+	echo "<script>window.location.href='affiliate.php';</script>";
 }
 elseif(isset($_GET['vehicle']) or isset($_GET['vrr']) or isset($_GET['users'])) $_SESSION['updateCounter'] = 0;
 elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
@@ -569,13 +564,13 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 			<div class="dropdown">
 				<button class="dropbtn">View Database</button>
 				<div class="dropdown-content">
-					<a href="manager.php?vehicle=1">Cars</a>
-					<a href="manager.php?vrr=1">VRR</a>
-					<a href="manager.php?users=1">Users</a>
+					<a href="affiliate.php?vehicle=1">Cars</a>
+					<a href="affiliate.php?vrr=1">VRR</a>
+					<a href="affiliate.php?users=1">Users</a>
 				</div>
 			</div>
 			
-			<button class="dropbtn" name="viewReports">Reports</button>
+			<!-- <button class="dropbtn" name="viewReports">Reports</button> -->
 			<!-- <div class="dropdown">
 				<button class="dropbtn">Reports</button>
 				<div class="dropdown-content">
@@ -584,8 +579,8 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 					<a href="">User Report</a>
 				</div>
 			</div> -->
-			<button class="dropbtn" name="viewAffiliates">Affiliates</button>
 			<button class="dropbtn" name="viewAccount">Account</button>
+			<button class="dropbtn" name="viewQuotation">Quotation</button>
 			<?php
 			if($_SESSION['Accounttype']=="Manager") echo "<button class='dropbtn' name='viewLog'>Logs</button>";
 			?>
@@ -615,8 +610,13 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 			$userstotal=mysqli_num_rows($usersquery);
 			$affilquery=mysqli_query($con,'SELECT * FROM affiliates_database');
 			$affiltotal=mysqli_num_rows($affilquery);
-			$vrrquery=mysqli_query($con,'SELECT * FROM vrr_database');
+			$vrrquery=mysqli_query($con,'SELECT * FROM vrr_database where Status="Pending" and Affiliates=(SELECT Affiliates_Name from affiliates_database where affiliate_user='.$_SESSION['UserID'].') and Branch=(SELECT Branch from affiliates_database where affiliate_user='.$_SESSION['UserID'].') ');
 			$vrrtotal=mysqli_num_rows($vrrquery);
+
+			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where affiliate_user='.$_SESSION['UserID'].'');
+			$quotAll=mysqli_num_rows($vrrquery);
+			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where quot_status="pending" and affiliate_user='.$_SESSION['UserID'].'');
+			$quotPending=mysqli_num_rows($vrrquery);
 			if($_SESSION['Accounttype']=="Manager")
 			{
 				$vrrpending=mysqli_query($con,"SELECT * FROM vrr_database WHERE User_Account = 'Manager'");
@@ -635,9 +635,9 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 			{
 				include "logDetails.php";
 			}
-			elseif(isset($_POST['viewAffiliates']) or isset($_GET['affil']))
+			elseif(isset($_POST['viewQuotation']) or isset($_GET['affil']))
 			{
-				include "affiliatesDatabase.php";
+				include "quotation.php";
 			}
 			elseif(isset($_POST['viewReports']) or isset($_GET['affil']))
 			{
@@ -650,34 +650,25 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 					<tr>
 						<td style="border-top-left-radius: 20px; border-bottom-left-radius: 20px; border-right: 2px solid black;">
 							<table style="border-collapse: collapse;" cellpadding="10" cellspacing="10">
+                                <tr>
+                                    <td bgcolor="white"><b>Pending Quotation:</b> <a href="manager.php?vehicle=repair">'.$quotPending.'</a></td>
+                                </tr>
 								<tr>
-									<td bgcolor="white"><b>Total Number of Cars for Reservation:</b> <a href="manager.php?vehicle=reserve">'.$reservetotal.'</a></td>
-								</tr>
-								<tr>
-									<td bgcolor="white"><b>Total Number of VRR Tickets:</b> <a href="manager.php?vrr=total">'.$vrrtotal.'</a></td>
-								</tr>
-								<tr>
-									<td bgcolor="white"><b>Total Number of Cars Reserved:</b> <a href="manager.php?vehicle=reserved">'.$reservedtotal.'</a></td>
-								</tr>
-								<tr>
-									<td bgcolor="white"><b>Total Number of Cars Under Repair:</b> <a href="manager.php?vehicle=repair">'.$repairtotal.'</a></td>
+									<td bgcolor="white"><b>Total Number of Quotation:</b> <a href="manager.php?vrr=total">'.$quotAll.'</a></td>
 								</tr>
 							</table>
 						</td>
 						<td bgcolor="white" style="border-right: 2px solid black;">
 							<table style="border-collapse: collapse;" cellpadding="10" cellspacing="10">
-								<tr>
-									<td bgcolor="white"><b>Total Number of User Accounts:</b> <a href="manager.php?users=total">'.$userstotal.'</a></td>
-								</tr>
-								<tr>
-									<td bgcolor="white"><b>Total Number of Affiliates:</b> <a href="manager.php?affil=total">'.$affiltotal.'</a></td>
-								</tr>
-								<tr>
-									<td bgcolor="white"><b>Total Number of Owned Cars:</b> <a href="manager.php?vehicle=owned">'.$vehicletotal.'</a></td>
-								</tr>
-								<tr>
-									<td bgcolor="white"><b>Pending Tickets:</b> <a href="manager.php?vrr=pending">'.$pendingtotal.'</a></td>
-								</tr>
+                                <tr>
+                                    <td bgcolor="white"><b>Total Number of Pending Tickets:</b> <a href="manager.php?vrr=total">'.$vrrtotal.'</a></td>
+                                </tr>
+                                <tr>
+                                    <td bgcolor="white"><b>Total Number of Cars Under Repair:</b> <a href="manager.php?vehicle=repair">'.$repairtotal.'</a></td>
+                                </tr>
+                                <tr>
+                                    <td bgcolor="white"><b>Total Number of Cars Repaired:</b> <a href="manager.php?vehicle=reserved">'.$reservedtotal.'</a></td>
+                                </tr>
 							</table>
 						</td>
 						<td bgcolor="white" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px;">

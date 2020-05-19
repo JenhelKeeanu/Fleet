@@ -162,11 +162,29 @@ elseif(isset($_GET['affil']))
 				</tr>
 				<tr style="background-color: white;">
 					<td align="right"><b>Affiliates Name:</b></td>
-					<td><input type="text" name="addAname"></td>
+					<td><input required type="text" id="affName" name="addAname"></td>
 				</tr>
 				<tr style="background-color: white;">
 					<td align="right"><b>Affiliates Branch:</b></td>
-					<td><input type="text" name="addAbranch"></td>
+					<td><input required type="text" id="affBranch" name="addAbranch"></td>
+				</tr>
+				<tr style="background-color: white;">
+					<td align="right"><b>Affiliates Username:</b></td>
+					<td><input required type="text" id="affUser" name="addAuser" readonly style="background:#f3f3f3"></td>
+				</tr>
+				<tr style="background-color: white;">
+					<td align="right"><b>Affiliates Email:</b></td>
+					<td><input required type="text" name="addAemail"></td>
+				</tr>
+				<tr style="background-color: white;">
+					<td align="right"><b>Affiliates Contact No:</b></td>
+					<td><input required type="text" name="addAcontact"></td>
+				</tr>
+				<tr style="background-color: white;">
+					<td align="right"><b>Affiliates Address:</b></td>
+					<td>
+					<textarea name='addAaddress' required style="width:60%"
+					></textarea></td>
 				</tr>
 				<tr style="background-color: white;">
 					<td colspan="2"><input type="submit" name="saveAffiliate" class="button button5"></td>

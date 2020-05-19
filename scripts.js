@@ -1,4 +1,10 @@
 
+$("#affName").on("input",function(){
+	$("#affUser").val($(this).val()+"_"+$("#affBranch").val());
+})
+$("#affBranch").on("input",function(){
+	$("#affUser").val($("#affName").val()+"_"+$(this).val());
+})
 $("#btn_Add_Vrr").on("click",function(){
 	$('#modal_Add_Vrr').css('display','block')
 })
