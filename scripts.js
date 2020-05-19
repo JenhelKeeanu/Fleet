@@ -2,8 +2,30 @@
 $("#affName").on("input",function(){
 	$("#affUser").val($(this).val()+"_"+$("#affBranch").val());
 })
+$("#addQuotPlate").on("change",function(){
+	var brand=" "
+	var model=" "
+	brand=$(this).find(':selected').attr('data-brand')
+	model=$(this).find(':selected').attr('data-model')
+	$("#addQuotBrand").val(brand)
+	$("#addQuotModel").val(model)
+})
 $("#affBranch").on("input",function(){
 	$("#affUser").val($("#affName").val()+"_"+$(this).val());
+})
+$("#btn_addQuotation").on("click",function(){
+	$('.modal-backDrop').css('display','block')
+	$('.modal_add_quotation').css('display','block')
+})
+$(".modal-backDrop").on("click",function(){
+	$('.modal-backDrop').css('display','none')
+	$("#ADDQUOTATIONFORM").trigger("reset");
+	$('.modal_add_quotation').css('display','none')
+})
+$("#modal_close_quotation").on("click",function(){
+	$("#ADDQUOTATIONFORM").trigger("reset");
+	$('.modal-backDrop').css('display','none')
+	$('.modal_add_quotation').css('display','none')
 })
 $("#btn_Add_Vrr").on("click",function(){
 	$('#modal_Add_Vrr').css('display','block')
