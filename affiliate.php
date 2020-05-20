@@ -145,7 +145,7 @@ elseif(isset($_POST['submit_addQuotation'])){
 	'". $_POST['addQuotAmount']  ."',	
 	'0',
 	'Pending',
-	now())");
+	now(),'". $_POST['addQuotVRR']  ."')");
 	// echo "<script>alert('Quotation Added.');window.location.href='affiliate.php';</script>";
 }
 elseif(isset($_POST['returnSave']))
@@ -579,14 +579,13 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 <body bgcolor="#d3d3d3" onload="PMS(), <?php if(isset($_GET['action'])) echo "modal()"; if(isset($_GET['notePage']) or isset($_GET['noteEnd'])) echo "note()";?>">
 	<form action="#" method="POST">
 		<div class="topnav">
-			<div class="dropdown">
+			<!-- <div class="dropdown">
 				<button class="dropbtn">View Database</button>
 				<div class="dropdown-content">
 					<a href="affiliate.php?vehicle=1">Cars</a>
-					<a href="affiliate.php?vrr=1">VRR</a>
 					<a href="affiliate.php?users=1">Users</a>
 				</div>
-			</div>
+			</div> -->
 			
 			<!-- <button class="dropbtn" name="viewReports">Reports</button> -->
 			<!-- <div class="dropdown">
@@ -597,8 +596,11 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 					<a href="">User Report</a>
 				</div>
 			</div> -->
+			<a	class="dropbtn a-drop"  href="affiliate.php?viewVRR">VRR </a>
+			<!-- <a	class="dropbtn a-drop"  href="affiliate.php?viewQuotation">Quotation </a> -->
+			<!-- <button class="dropbtn" name="viewVRR">VRR</button> -->
 			<button class="dropbtn" name="viewAccount">Account</button>
-			<button class="dropbtn" name="viewQuotation">Quotation</button>
+			<a	class="dropbtn a-drop"  href="affiliate.php?viewQuotation">Quotation </a>
 			<?php
 			if($_SESSION['Accounttype']=="Manager") echo "<button class='dropbtn' name='viewLog'>Logs</button>";
 			?>
@@ -628,13 +630,18 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 			$userstotal=mysqli_num_rows($usersquery);
 			$affilquery=mysqli_query($con,'SELECT * FROM affiliates_database');
 			$affiltotal=mysqli_num_rows($affilquery);
-			$vrrquery=mysqli_query($con,'SELECT * FROM vrr_database where Status="Pending" and Affiliates=(SELECT Affiliates_Name from affiliates_database where affiliate_user='.$_SESSION['UserID'].') and Branch=(SELECT Branch from affiliates_database where affiliate_user='.$_SESSION['UserID'].') ');
+			// echo 'SELECT * FROM vrr_database where Status="Pending" and Affiliates=(SELECT Affiliates_Name from affiliates_database where affiliate_user='.$_SESSION['UserID'].') and Branch=(SELECT Branch from affiliates_database where affiliate_user='.$_SESSION['UserID'].') ';
+			$vrrquery=mysqli_query($con,'SELECT * FROM vrr_database where Status="Affiliate Repair" and Affiliates=(SELECT Affiliates_Name from affiliates_database where affiliate_user='.$_SESSION['UserID'].') and Branch=(SELECT Branch from affiliates_database where affiliate_user='.$_SESSION['UserID'].') ');
 			$vrrtotal=mysqli_num_rows($vrrquery);
 
 			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where affiliate_user='.$_SESSION['UserID'].'');
 			$quotAll=mysqli_num_rows($vrrquery);
 			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where quot_status="pending" and affiliate_user='.$_SESSION['UserID'].'');
 			$quotPending=mysqli_num_rows($vrrquery);
+			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where quot_status="approved" and affiliate_user='.$_SESSION['UserID'].'');
+			$quotApproved=mysqli_num_rows($vrrquery);
+			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where quot_status="declined" and affiliate_user='.$_SESSION['UserID'].'');
+			$quotDeclined=mysqli_num_rows($vrrquery);
 			if($_SESSION['Accounttype']=="Manager")
 			{
 				$vrrpending=mysqli_query($con,"SELECT * FROM vrr_database WHERE User_Account = 'Manager'");
@@ -657,6 +664,10 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 			{
 				include "quotation.php";
 			}
+			elseif(isset($_POST['viewVRR']) or isset($_GET['viewVRR']))
+			{
+				include "vrr.php";
+			}
 			elseif(isset($_POST['viewReports']) or isset($_GET['affil']))
 			{
 				include "reports.php";
@@ -671,21 +682,24 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
                                 <tr>
                                     <td bgcolor="white"><b>Pending Quotation:</b> <a href="affiliate.php?viewQuotation=Pending">'.$quotPending.'</a></td>
                                 </tr>
-								<tr>
-									<td bgcolor="white"><b>Total Number of Quotation:</b> <a href="affiliate.php?viewQuotation">'.$quotAll.'</a></td>
-								</tr>
+                                <tr>
+                                    <td bgcolor="white"><b>Approved Quotation:</b> <a href="affiliate.php?viewQuotation=Approved">'.$quotApproved.'</a></td>
+                                </tr>
+                                <tr>
+                                    <td bgcolor="white"><b>Declined Quotation:</b> <a href="affiliate.php?viewQuotation=Declined">'.$quotDeclined.'</a></td>
+                                </tr>
 							</table>
 						</td>
 						<td bgcolor="white" style="border-right: 2px solid black;">
 							<table style="border-collapse: collapse;" cellpadding="10" cellspacing="10">
+								<tr>
+									<td bgcolor="white"><b>Total Number of Quotation:</b> <a href="affiliate.php?viewQuotation">'.$quotAll.'</a></td>
+								</tr>
                                 <tr>
-                                    <td bgcolor="white"><b>Total Number of Pending Tickets:</b> <a href="affiliate.php?vrr=total">'.$vrrtotal.'</a></td>
+                                    <td bgcolor="white"><b>VRR Received:</b> <a href="affiliate.php?vrr=total">'.$vrrtotal.'</a></td>
                                 </tr>
                                 <tr>
-                                    <td bgcolor="white"><b>Total Number of Cars Under Repair:</b> <a href="affiliate.php?vehicle=repair">'.$repairtotal.'</a></td>
-                                </tr>
-                                <tr>
-                                    <td bgcolor="white"><b>Total Number of Cars Repaired:</b> <a href="affiliate.php?vehicle=reserved">'.$reservedtotal.'</a></td>
+                                    <td bgcolor="white"><b>Cars Repaired:</b> <a href="affiliate.php?vehicle=reserved">'.$reservedtotal.'</a></td>
                                 </tr>
 							</table>
 						</td>

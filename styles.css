@@ -199,3 +199,9 @@ body{
     top: 0;
     opacity: .2;
 }
+.a-drop{
+	padding:19px !important;
+}
+.a-drop:hover{
+	background-color: #3e8e41 !important
+}

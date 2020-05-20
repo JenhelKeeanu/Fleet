@@ -13,7 +13,15 @@ $("#addQuotPlate").on("change",function(){
 $("#affBranch").on("input",function(){
 	$("#affUser").val($("#affName").val()+"_"+$(this).val());
 })
-$("#btn_addQuotation").on("click",function(){
+$(".btn_addQuotation").on("click",function(){
+	var id=$(this).val();
+	var ct=$(this).data("ct");
+	var cb=$(this).data("cb");
+	var pt=$(this).data("pt");
+	$("#addQuotVRR").val(id)
+	$("#addQuotPlate").val(pt)
+	$("#addQuotBrand").val(cb)
+	$("#addQuotModel").val(pt)
 	$('.modal-backDrop').css('display','block')
 	$('.modal_add_quotation').css('display','block')
 })
