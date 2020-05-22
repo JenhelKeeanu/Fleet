@@ -18,6 +18,23 @@ elseif(isset($_POST['saveAffiliate']))
 		}
 	}
 }
+elseif(isset($_POST['quotationStat']))
+{
+	$dateToday = date("Y-m-d");
+	$timeToday = date("h:i:sa");
+	include "data.php";
+	if($_POST['quotationStat']=='approve'){
+		$status="approved-manager";
+		$mess="Quotation Approved, Sent to Billing for cheque number";
+	}
+	else{
+		$status="declined";
+		$mess="Quotation Declined";
+	}
+	$affilUpdate = mysqli_query($con,"UPDATE quotation_database SET 
+	quot_status = '". $status ."' WHERE quot_id=". $_POST['ids'] ."");
+	echo "<script>alert('{$mess}');window.location.href='manager.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+}
 elseif(isset($_POST['updateAffil']))
 {
 	$dateToday = date("Y-m-d");
@@ -557,6 +574,8 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="//cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+	<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
 </head>
 <style type="text/css">
 	<?php
@@ -572,6 +591,7 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 					<a href="manager.php?vehicle=1">Cars</a>
 					<a href="manager.php?vrr=1">VRR</a>
 					<a href="manager.php?users=1">Users</a>
+					<a href="manager.php?viewQuotation">Quotation </a>
 				</div>
 			</div>
 			
@@ -617,6 +637,8 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 			$affiltotal=mysqli_num_rows($affilquery);
 			$vrrquery=mysqli_query($con,'SELECT * FROM vrr_database');
 			$vrrtotal=mysqli_num_rows($vrrquery);
+			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database where quot_status="Pending"');
+			$quotAll=mysqli_num_rows($vrrquery);
 			if($_SESSION['Accounttype']=="Manager")
 			{
 				$vrrpending=mysqli_query($con,"SELECT * FROM vrr_database WHERE User_Account = 'Manager'");
@@ -634,6 +656,10 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 			elseif(isset($_POST['viewLog']) or isset($_GET['page']) or isset($_GET['end']))
 			{
 				include "logDetails.php";
+			}
+			elseif(isset($_POST['viewQuotation']) or isset($_GET['viewQuotation']))
+			{
+				include "quotationManager.php";
 			}
 			elseif(isset($_POST['viewAffiliates']) or isset($_GET['affil']))
 			{
@@ -677,6 +703,9 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 								</tr>
 								<tr>
 									<td bgcolor="white"><b>Pending Tickets:</b> <a href="manager.php?vrr=pending">'.$pendingtotal.'</a></td>
+								</tr>
+								<tr>
+									<td bgcolor="white"><b>Pending Quotation:</b> <a href="manager.php?viewQuotation=Pending">'.$quotAll.'</a></td>
 								</tr>
 							</table>
 						</td>
