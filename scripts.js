@@ -13,6 +13,24 @@ $("#addQuotPlate").on("change",function(){
 $("#affBranch").on("input",function(){
 	$("#affUser").val($("#affName").val()+"_"+$(this).val());
 })
+$(".btn_resendQuotation").on("click",function(){
+	var id=$(this).data("id");
+	var ct=$(this).data("model");
+	var cb=$(this).data("brand");
+	var pt=$(this).data("plate");
+	var desc=$(this).data("desc");
+	var amount=$(this).data("plate");
+	alert("RESEND")
+	$("#addQuotVRR").val(id)
+	$("#addQuotPlate").val(pt)
+	$("#addQuotBrand").val(cb)
+	$("#addQuotModel").val(ct)
+	$("#addQuotID").val(id)
+	$("#addQuotDesc").append(desc)
+	$("#addQuotAmount").val(amount)
+	$('.modal-backDrop').css('display','block')
+	$('.modal_resend_quotation').css('display','block')
+})
 $(".btn_addQuotation").on("click",function(){
 	var id=$(this).val();
 	var ct=$(this).data("ct");
@@ -30,6 +48,7 @@ $(".modal-backDrop").on("click",function(){
 	$("#ADDQUOTATIONFORM").trigger("reset");
 	$('.modal_add_quotation').css('display','none')
 	$('.modal_add_cheque').css('display','none')
+	$('.modal_resend_quotation').css('display','none')
 })
 $("#modal_close_quotation").on("click",function(){
 	$("#ADDQUOTATIONFORM").trigger("reset");

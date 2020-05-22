@@ -168,7 +168,7 @@ body{
 #txtHint{
 	text-align: left !important;
 }
-.modal_add_quotation,.modal_add_cheque{
+.modal_add_quotation,.modal_add_cheque,.modal_resend_quotation{
 	display:none;
     width: 25%;
     position: fixed;

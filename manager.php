@@ -33,7 +33,7 @@ elseif(isset($_POST['quotationStat']))
 	}
 	$affilUpdate = mysqli_query($con,"UPDATE quotation_database SET 
 	quot_status = '". $status ."' WHERE quot_id=". $_POST['ids'] ."");
-	echo "<script>alert('{$mess}');window.location.href='manager.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+	echo "<script>alert('{$mess}');window.location.href='manager.php?vrrDetails';</script>";
 }
 elseif(isset($_POST['updateAffil']))
 {

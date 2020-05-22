@@ -42,7 +42,7 @@
                             $status=$showPlate['quot_status'];
                             if($status=='approved-manager')
                                 $status='Approved - Unpaid';
-                            else
+                            elseif($status=='approved-manager')
                                 $status='Approved - Paid';
                             echo "<tr id='row{$showPlate['quot_id']}' value='false'>
                             <td onclick=showVRR('{$showPlate['quot_id']}','{$showPlate['VRR_Type']}','{$showPlate['VRR_Date']}','{$showPlate['VRR_Concern']}','{$showPlate['ODO']}')>
@@ -66,7 +66,7 @@
                             <td onclick=showVRR('{$showPlate['quot_id']}','{$showPlate['VRR_Type']}','{$showPlate['VRR_Date']}','{$showPlate['VRR_Concern']}','{$showPlate['ODO']}')>{$showPlate['quot_createDate']}
                             </td>
                             <td>";
-                            if($showPlate['quot_status']=='Pending')
+                            if($status=='pending')
                                 echo "<form action='#' method='POST' class='btn-group-vertical' style='margin:0'>
                                         <input type='hidden' value='{$showPlate['quot_id']}' name='ids'>
                                         <button name='quotationStat' class='btn btn-success approve' value='approve'>Approve</button>

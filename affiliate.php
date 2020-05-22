@@ -144,9 +144,21 @@ elseif(isset($_POST['submit_addQuotation'])){
 	'". $_POST['addQuotDesc'] ."',
 	'". $_POST['addQuotAmount']  ."',	
 	'0',
-	'Pending',
+	'pending',
 	now(),'". $_POST['addQuotVRR']  ."')");
-	// echo "<script>alert('Quotation Added.');window.location.href='affiliate.php';</script>";
+	echo "<script>alert('Quotation Added.');window.location.href='affiliate.php';</script>";
+}
+elseif(isset($_POST['submit_resendQuotation'])){
+	$dateToday = date("Y-m-d");
+	$timeToday = date("h:i:sa");
+	include "data.php";
+	$newNote = mysqli_query($con,"UPDATE quotation_database SET 
+	quot_description = '".$_POST['addQuotDesc']."',
+	quot_amount = '". $_POST['addQuotAmount']  ."',
+	quot_status= 'pending',
+	quot_createDate = now()
+	where quot_id=". $_POST['addQuotID']  ."");
+	echo "<script>alert('Quotation Resend.');window.location.href='affiliate.php';</script>";
 }
 elseif(isset($_POST['returnSave']))
 {
