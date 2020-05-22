@@ -20,7 +20,6 @@ $(".btn_resendQuotation").on("click",function(){
 	var pt=$(this).data("plate");
 	var desc=$(this).data("desc");
 	var amount=$(this).data("plate");
-	alert("RESEND")
 	$("#addQuotVRR").val(id)
 	$("#addQuotPlate").val(pt)
 	$("#addQuotBrand").val(cb)
