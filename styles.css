@@ -168,7 +168,7 @@ body{
 #txtHint{
 	text-align: left !important;
 }
-.modal_add_quotation{
+.modal_add_quotation,.modal_add_cheque{
 	display:none;
     width: 25%;
     position: fixed;
@@ -177,13 +177,13 @@ body{
     left: 37.5%;
     border-radius: 25px;
 }
-.modal_add_quotation .modal_content{
+.modal_content{
 	padding:5%
 }
-.modal_add_quotation .modal_content .body .form-group label{
+.modal_content .body .form-group label{
 	text-align: left !important;
 }
-.modal_add_quotation .modal_content .header{
+.modal_content .header{
     text-align: left;
     font-size: 22px;
 	font-weight: bold;

@@ -29,11 +29,13 @@ $(".modal-backDrop").on("click",function(){
 	$('.modal-backDrop').css('display','none')
 	$("#ADDQUOTATIONFORM").trigger("reset");
 	$('.modal_add_quotation').css('display','none')
+	$('.modal_add_cheque').css('display','none')
 })
 $("#modal_close_quotation").on("click",function(){
 	$("#ADDQUOTATIONFORM").trigger("reset");
 	$('.modal-backDrop').css('display','none')
 	$('.modal_add_quotation').css('display','none')
+	$('.modal_add_cheque').css('display','none')
 })
 $("#btn_Add_Vrr").on("click",function(){
 	$('#modal_Add_Vrr').css('display','block')

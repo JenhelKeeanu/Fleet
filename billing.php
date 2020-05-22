@@ -1,6 +1,6 @@
 <?php
 session_start();
-if(isset($_POST['viewLog'])) echo "<script>window.location.href='affiliate.php?page=1';</script>";
+if(isset($_POST['viewLog'])) echo "<script>window.location.href='billing.php?page=1';</script>";
 elseif(isset($_POST['saveAffiliate']))
 {
 	include "data.php";
@@ -10,8 +10,15 @@ elseif(isset($_POST['saveAffiliate']))
 	else
 	{
 		$addArecord = mysqli_query($con,"INSERT INTO affiliates_database (Affiliates_Name,Branch) VALUES ('". $_POST['addAname'] ."','". $_POST['addAbranch'] ."')");
-		echo "<script>alert('Account successfully saved.');window.location.href='affiliate.php?affil=1';</script>";
+		echo "<script>alert('Account successfully saved.');window.location.href='billing.php?affil=1';</script>";
 	}
+}
+elseif(isset($_POST['save_cheque'])){
+	include "data.php";
+	$affilUpdate = mysqli_query($con,"UPDATE quotation_database SET 
+	quot_status = 'approved-paid',
+    quot_cheque = '". $_POST['chequeNum'] ."' WHERE quot_id=". $_POST['ids'] ."");
+	echo "<script>alert('Cheque Sent');window.location.href='billing.php?viewQuotation';</script>";
 }
 elseif(isset($_POST['updateAffil']))
 {
@@ -37,7 +44,7 @@ elseif(isset($_POST['updateAffil']))
 	'". $_POST['affilList'] ."(". $_POST['branchList'] .")',
 	'". $dateToday ."',
 	'". $timeToday ."')");
-	echo "<script>alert('Ticket assigned to affiliate.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+	echo "<script>alert('Ticket assigned to affiliate.');window.location.href='billing.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 }
 elseif(isset($_POST['updateQC']))
 {
@@ -60,7 +67,7 @@ elseif(isset($_POST['updateQC']))
 	'By: ". $_SESSION['Fullname'] ."',
 	'". $dateToday ."',
 	'". $timeToday ."')");
-	echo "<script>alert('Ticket assigned to QC Department.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+	echo "<script>alert('Ticket assigned to QC Department.');window.location.href='billing.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 }
 elseif(isset($_POST['noteSave']))
 {
@@ -80,7 +87,7 @@ elseif(isset($_POST['noteSave']))
 	'By: ". $_SESSION['Fullname'] ."',
 	'". $dateToday ."',
 	'". $timeToday ."')");
-	echo "<script>alert('Additional note has been added.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+	echo "<script>alert('Additional note has been added.');window.location.href='billing.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 }
 elseif(isset($_POST['userSave']))
 {
@@ -106,7 +113,7 @@ elseif(isset($_POST['userSave']))
 		'Quality Controller',
 		'". $dateToday ."',
 		'". $timeToday ."')");
-		echo "<script>alert('Additional note has been added.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+		echo "<script>alert('Additional note has been added.');window.location.href='billing.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 	}
 	elseif($_SESSION['Accounttype']=="Secretary")
 	{
@@ -130,7 +137,7 @@ elseif(isset($_POST['userSave']))
 		'Manager',
 		'". $dateToday ."',
 		'". $timeToday ."')");
-		echo "<script>alert('Additional note has been added.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+		echo "<script>alert('Additional note has been added.');window.location.href='billing.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 	}
 }
 elseif(isset($_POST['submit_addQuotation'])){
@@ -146,7 +153,7 @@ elseif(isset($_POST['submit_addQuotation'])){
 	'0',
 	'Pending',
 	now(),'". $_POST['addQuotVRR']  ."')");
-	// echo "<script>alert('Quotation Added.');window.location.href='affiliate.php';</script>";
+	// echo "<script>alert('Quotation Added.');window.location.href='billing.php';</script>";
 }
 elseif(isset($_POST['returnSave']))
 {
@@ -178,7 +185,7 @@ elseif(isset($_POST['returnSave']))
 	'Quality Controller',
 	'". $dateToday ."',
 	'". $timeToday ."')");
-	echo "<script>alert('Ticket returned to Quality Control.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+	echo "<script>alert('Ticket returned to Quality Control.');window.location.href='billing.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 }
 elseif(isset($_POST['statusSave']))
 {
@@ -204,7 +211,7 @@ elseif(isset($_POST['statusSave']))
 			'By: ". $_SESSION['Fullname'] ."',
 			'". $dateToday ."',
 			'". $timeToday ."')");
-			echo "<script>alert('Ticket has been cancelled.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+			echo "<script>alert('Ticket has been cancelled.');window.location.href='billing.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 		}
 		elseif($_POST['statusChoice']=="Repair Checking")
 		{
@@ -227,7 +234,7 @@ elseif(isset($_POST['statusSave']))
 			'Quality Controller',
 			'". $dateToday ."',
 			'". $timeToday ."')");
-			echo "<script>alert('Ticket forwarded to Quality Control.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+			echo "<script>alert('Ticket forwarded to Quality Control.');window.location.href='billing.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 		}
 		elseif($_POST['statusChoice']=="For Rent")
 		{
@@ -247,7 +254,7 @@ elseif(isset($_POST['statusSave']))
 			'By: ". $_SESSION['Fullname'] ."',
 			'". $dateToday ."',
 			'". $timeToday ."')");
-			echo "<script>alert('Ticket forwarded to dispatching department.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+			echo "<script>alert('Ticket forwarded to dispatching department.');window.location.href='billing.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 		}
 	}
 }
@@ -271,7 +278,7 @@ if(isset($_POST['openSave']))
 	'By: ". $_SESSION['Fullname'] ."',
 	'". $dateToday ."',
 	'". $timeToday ."')");
-	echo "<script>alert('Ticket has been opened.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+	echo "<script>alert('Ticket has been opened.');window.location.href='billing.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 
 }
 if(isset($_SESSION['security']))
@@ -284,19 +291,19 @@ if(isset($_SESSION['security']))
 elseif(!isset($_SESSION['security'])) echo "<script>window.location.href='index.php';</script>";
 if(isset($_POST['backV']))
 {
-	echo "<script>window.location.href='affiliate.php?vehicle=1';</script>";
+	echo "<script>window.location.href='billing.php?vehicle=1';</script>";
 }
 elseif(isset($_POST['backU']))
 {
-	echo "<script>window.location.href='affiliate.php?users=1';</script>";
+	echo "<script>window.location.href='billing.php?users=1';</script>";
 }
 elseif(isset($_POST['backA']))
 {
-	echo "<script>window.location.href='affiliate.php?affil=1';</script>";
+	echo "<script>window.location.href='billing.php?affil=1';</script>";
 }
 elseif(isset($_POST['backD']))
 {
-	echo "<script>window.location.href='affiliate.php?vrr=1';</script>";
+	echo "<script>window.location.href='billing.php?vrr=1';</script>";
 }
 elseif(isset($_POST['newVehicle']))
 {
@@ -310,7 +317,7 @@ elseif(isset($_POST['newVehicle']))
 	$N=mysqli_num_rows($Q);
 	if($N>0)
 	{
-		echo "<script>alert('Plate Number is already taken!');window.location.href='affiliate.php?vehicle=1';</script>";
+		echo "<script>alert('Plate Number is already taken!');window.location.href='billing.php?vehicle=1';</script>";
 	} 
 	else
 	{
@@ -327,7 +334,7 @@ elseif(isset($_POST['newVehicle']))
 		'". $_POST['saveStatus'] ."',
 		'". $dateToday ."',
 		'". $dateEnd ."')");
-		echo "<script>alert('New car has been added to the database!');window.location.href='affiliate.php?vehicle=1';</script>";
+		echo "<script>alert('New car has been added to the database!');window.location.href='billing.php?vehicle=1';</script>";
 	}
 }
 elseif(isset($_POST['saveAccount']))
@@ -362,7 +369,7 @@ elseif(isset($_POST['saveAccount']))
 			'". $_POST['saveType'] ."',
 			'". $_POST['saveEmail'] ."',
 			'". $_POST['saveAddress'] ."')");
-		echo "<script>alert('New account has been added.');window.location.href='affiliate.php?users=1';</script>";
+		echo "<script>alert('New account has been added.');window.location.href='billing.php?users=1';</script>";
 	}
 }
 elseif(isset($_POST['saveU']))
@@ -385,7 +392,7 @@ elseif(isset($_POST['saveU']))
 			Account_Type='". $_POST['saveType'] ."',
 			Email='". $_POST['saveEmail'] ."',
 			Address='". $_POST['saveAddress'] ."' WHERE User_ID = '". $_GET['view'] ."'");
-			echo "<script>alert('User account updated successfully.');window.location.href='affiliate.php?users=1';</script>";
+			echo "<script>alert('User account updated successfully.');window.location.href='billing.php?users=1';</script>";
 		}
 		else echo "<script>alert('Username already taken. Please choose another one.');</script>";
 	}
@@ -402,7 +409,7 @@ elseif(isset($_POST['saveU']))
 		Account_Type='". $_POST['saveType'] ."',
 		Email='". $_POST['saveEmail'] ."',
 		Address='". $_POST['saveAddress'] ."' WHERE User_ID = '". $_GET['view'] ."'");
-		echo "<script>alert('User account updated successfully.');window.location.href='affiliate.php?users=1';</script>";
+		echo "<script>alert('User account updated successfully.');window.location.href='billing.php?users=1';</script>";
 	}
 }
 if(isset($_POST['updateAccount']))
@@ -485,7 +492,7 @@ elseif(isset($_POST['saveAffil']))
 		$updatedA = mysqli_query($con,"UPDATE affiliates_database SET
 		Affiliates_Name = '". $_POST['updateAname'] ."',
 		Branch = '". $_POST['updateAbranch'] ."' WHERE Affiliates_ID = '". $_GET['aview'] ."'");
-		echo "<script>alert('Affiliate record successfully updated.'); window.location.href='affiliate.php?affil=1';</script>";
+		echo "<script>alert('Affiliate record successfully updated.'); window.location.href='billing.php?affil=1';</script>";
 	}
 }
 elseif(isset($_POST['saveVehicle']))
@@ -504,7 +511,7 @@ elseif(isset($_POST['saveVehicle']))
 			Status = '". $_POST['updateStatus'] ."',
 			PMS_Start = '". $_POST['updatePMSStart'] ."',
 			PMS_End = '". $_POST['updatePMSEnd'] ."' WHERE Vehicle_ID = '". $_GET['vview'] ."'");
-			echo "<script>alert('Car record successfully updated.');window.location.href='affiliate.php?vehicle=1';</script>";
+			echo "<script>alert('Car record successfully updated.');window.location.href='billing.php?vehicle=1';</script>";
 		}
 		else echo "<script>alert('Plate number already taken.');</script>";
 	}
@@ -517,32 +524,32 @@ elseif(isset($_POST['saveVehicle']))
 		Status = '". $_POST['updateStatus'] ."',
 		PMS_Start = '". $_POST['updatePMSStart'] ."',
 		PMS_End = '". $_POST['updatePMSEnd'] ."' WHERE Vehicle_ID = '". $_GET['vview'] ."'");
-		echo "<script>alert('Car record successfully updated.');window.location.href='affiliate.php?vehicle=1';</script>";
+		echo "<script>alert('Car record successfully updated.');window.location.href='billing.php?vehicle=1';</script>";
 	}
 }
 elseif(isset($_GET['deleteVRR']))
 {
 	include "data.php";
 	$deleteVRR = mysqli_query($con,"DELETE FROM vrr_database WHERE VRR_ID = '". $_GET['deleteVRR'] ."'");
-	echo "<script>alert('VRR record has been deleted.');window.location.href='affiliate.php?vrr=1';</script>";
+	echo "<script>alert('VRR record has been deleted.');window.location.href='billing.php?vrr=1';</script>";
 }
 elseif(isset($_GET['deleteVehicle']))
 {
 	include "data.php";
 	$deleteVehicle = mysqli_query($con,"DELETE FROM vehicle_database WHERE Vehicle_ID = '". $_GET['deleteVehicle'] ."'");
-	echo "<script>alert('Car record has been deleted.');window.location.href='affiliate.php?vehicle=1';</script>";
+	echo "<script>alert('Car record has been deleted.');window.location.href='billing.php?vehicle=1';</script>";
 }
 elseif(isset($_GET['deleteUser']))
 {
 	include "data.php";
 	$deleteUser = mysqli_query($con,"DELETE FROM users_database WHERE User_ID = '". $_GET['deleteUser'] ."'");
-	echo "<script>alert('User account has been deleted.');window.location.href='affiliate.php?users=1';</script>";
+	echo "<script>alert('User account has been deleted.');window.location.href='billing.php?users=1';</script>";
 }
 elseif(isset($_GET['deleteAffil']))
 {
 	include "data.php";
 	$deleteAffil = mysqli_query($con,"DELETE FROM vrr_database WHERE VRR_ID = '". $_GET['deleteAffil'] ."'");
-	echo "<script>alert('Affiliate record has been deleted.');window.location.href='affiliate.php?affil=1';</script>";
+	echo "<script>alert('Affiliate record has been deleted.');window.location.href='billing.php?affil=1';</script>";
 }
 elseif(isset($_POST['logout']))
 {
@@ -552,7 +559,7 @@ elseif(isset($_POST['logout']))
 elseif(isset($_POST['viewHome']))
 {
 	$_SESSION['updateCounter'] = 0;
-	echo "<script>window.location.href='affiliate.php';</script>";
+	echo "<script>window.location.href='billing.php';</script>";
 }
 elseif(isset($_GET['vehicle']) or isset($_GET['vrr']) or isset($_GET['users'])) $_SESSION['updateCounter'] = 0;
 elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
@@ -560,7 +567,7 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Affiliate Account</title>
+	<title>Billing Account</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -582,8 +589,8 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 			<!-- <div class="dropdown">
 				<button class="dropbtn">View Database</button>
 				<div class="dropdown-content">
-					<a href="affiliate.php?vehicle=1">Cars</a>
-					<a href="affiliate.php?users=1">Users</a>
+					<a href="billing.php?vehicle=1">Cars</a>
+					<a href="billing.php?users=1">Users</a>
 				</div>
 			</div> -->
 			
@@ -596,11 +603,11 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 					<a href="">User Report</a>
 				</div>
 			</div> -->
-			<a	class="dropbtn a-drop"  href="affiliate.php?viewVRR">VRR </a>
-			<!-- <a	class="dropbtn a-drop"  href="affiliate.php?viewQuotation">Quotation </a> -->
+			<!-- <a	class="dropbtn a-drop"  href="billing.php?viewVRR">VRR </a> -->
+			<!-- <a	class="dropbtn a-drop"  href="billing.php?viewQuotation">Quotation </a> -->
 			<!-- <button class="dropbtn" name="viewVRR">VRR</button> -->
 			<button class="dropbtn" name="viewAccount">Account</button>
-			<a	class="dropbtn a-drop"  href="affiliate.php?viewQuotation">Quotation </a>
+			<a	class="dropbtn a-drop"  href="billing.php?viewQuotation">Quotation </a>
 			<?php
 			if($_SESSION['Accounttype']=="Manager") echo "<button class='dropbtn' name='viewLog'>Logs</button>";
 			?>
@@ -636,11 +643,11 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 
 			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where affiliate_user='.$_SESSION['UserID'].'');
 			$quotAll=mysqli_num_rows($vrrquery);
-			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where quot_status="pending" and affiliate_user='.$_SESSION['UserID'].'');
-			$quotPending=mysqli_num_rows($vrrquery);
-			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where quot_status not in ("pending","decline") and affiliate_user='.$_SESSION['UserID'].'');
+			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where quot_status="approved-manager"');
+			$quotUnpaid=mysqli_num_rows($vrrquery);
+			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where quot_status="approved-paid"');
 			$quotApproved=mysqli_num_rows($vrrquery);
-			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where quot_status="declined" and affiliate_user='.$_SESSION['UserID'].'');
+			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where quot_status not in ("pending","decline")');
 			$quotDeclined=mysqli_num_rows($vrrquery);
 			if($_SESSION['Accounttype']=="Manager")
 			{
@@ -662,7 +669,7 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 			}
 			elseif(isset($_POST['viewQuotation']) or isset($_GET['viewQuotation']))
 			{
-				include "quotation.php";
+				include "quotationManager.php";
 			}
 			elseif(isset($_POST['viewVRR']) or isset($_GET['viewVRR']))
 			{
@@ -680,27 +687,14 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 						<td style="border-top-left-radius: 20px; border-bottom-left-radius: 20px; border-right: 2px solid black;">
 							<table style="border-collapse: collapse;" cellpadding="10" cellspacing="10">
                                 <tr>
-                                    <td bgcolor="white"><b>Pending Quotation:</b> <a href="affiliate.php?viewQuotation=Pending">'.$quotPending.'</a></td>
+                                    <td bgcolor="white"><b>Approved Quotation (Unpaid):</b> <a href="billing.php?viewQuotation=Unpaid">'.$quotUnpaid.'</a></td>
                                 </tr>
                                 <tr>
-                                    <td bgcolor="white"><b>Approved Quotation:</b> <a href="affiliate.php?viewQuotation=Approved">'.$quotApproved.'</a></td>
+                                    <td bgcolor="white"><b>Approved Quotation (Paid):</b> <a href="billing.php?viewQuotation=Approved">'.$quotApproved.'</a></td>
                                 </tr>
-                                <tr>
-                                    <td bgcolor="white"><b>Declined Quotation:</b> <a href="affiliate.php?viewQuotation=Declined">'.$quotDeclined.'</a></td>
-                                </tr>
-							</table>
-						</td>
-						<td bgcolor="white" style="border-right: 2px solid black;">
-							<table style="border-collapse: collapse;" cellpadding="10" cellspacing="10">
 								<tr>
-									<td bgcolor="white"><b>Total Number of Quotation:</b> <a href="affiliate.php?viewQuotation">'.$quotAll.'</a></td>
+									<td bgcolor="white"><b>Total Number of Quotation:</b> <a href="billing.php?viewQuotation">'.$quotDeclined.'</a></td>
 								</tr>
-                                <tr>
-                                    <td bgcolor="white"><b>VRR Received:</b> <a href="affiliate.php?vrr=total">'.$vrrtotal.'</a></td>
-                                </tr>
-                                <tr>
-                                    <td bgcolor="white"><b>Cars Repaired:</b> <a href="affiliate.php?vehicle=reserved">'.$reservedtotal.'</a></td>
-                                </tr>
 							</table>
 						</td>
 						<td bgcolor="white" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px;">
