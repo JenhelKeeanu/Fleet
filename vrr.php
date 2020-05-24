@@ -27,7 +27,7 @@
                 <tbody>
                     <?php
                         // echo 'SELECT *,(select quot_id from quotation_database where quote_vrr=qd.VRR_ID) as QUOT FROM vrr_database qd join vehicle_database vd on qd.Plate_No=vd.Vehicle_Plate where qd.Status="Affiliate Repair" and qd.Affiliates=(SELECT Affiliates_Name from affiliates_database where affiliate_user='.$_SESSION['UserID'].') and Branch=(SELECT Branch from affiliates_database where affiliate_user='.$_SESSION['UserID'].') ';
-                        $vrrRep=mysqli_query($con,'SELECT *,(select quot_id from quotation_database where quote_vrr=qd.VRR_ID and quot_status not in ("approved-manager","approved-paid")) as QUOT FROM vrr_database qd join vehicle_database vd on qd.Plate_No=vd.Vehicle_Plate where qd.Status="Affiliate Repair" and qd.Affiliates=(SELECT Affiliates_Name from affiliates_database where affiliate_user='.$_SESSION['UserID'].') and Branch=(SELECT Branch from affiliates_database where affiliate_user='.$_SESSION['UserID'].') ');
+                        $vrrRep=mysqli_query($con,'SELECT *,(select quot_id from quotation_database where quote_vrr=qd.VRR_ID and quot_status in ("approved-manager","approved-paid")) as QUOT FROM vrr_database qd join vehicle_database vd on qd.Plate_No=vd.Vehicle_Plate where qd.Status="Affiliate Repair" and qd.Affiliates=(SELECT Affiliates_Name from affiliates_database where affiliate_user='.$_SESSION['UserID'].') and Branch=(SELECT Branch from affiliates_database where affiliate_user='.$_SESSION['UserID'].') ');
                         
                         while($vrr = mysqli_fetch_array($vrrRep))
                         {
@@ -46,7 +46,7 @@
                             </td>
                             <td>{$vrr['ODO']}
                             </td>
-                            <td>";
+                            <td>{$vrr['QUOT']}";
                             if($vrr['QUOT']==null)
                             echo "<button class='btn btn-secondary mb-3 btn_addQuotation' value='{$vrr['VRR_ID']}' data-ct='{$vrr['Car_Type']}' data-cb='{$vrr['Car_Brand']}' data-pt='{$vrr['Vehicle_ID']}'>ADD QUOTATION
                             </button>";
