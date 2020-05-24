@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 if(isset($_POST['viewLog'])) echo "<script>window.location.href='manager.php?page=1';</script>";
 elseif(isset($_POST['saveAffiliate']))
 {
@@ -623,6 +624,42 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 		<div style="padding-top: 50px;">
 			<?php
 			include 'data.php';
+			if(isset($_SESSION['notif']) && !empty($_SESSION['notif'])) {
+				if($_SESSION['Accounttype']=="Manager")
+					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Checking' and User_Account='Manager' order by Note_ID DESC Limit 1");
+				else
+					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Checking' and User_Account='Secretary' order by Note_ID DESC Limit 1");
+				// echo $Latest;
+				while($late = mysqli_fetch_array($Latest))
+				{	
+					if($_SESSION['notifID']==$late['VRR_ID']&&$_SESSION['notifNote']==$late['Note_ID']){
+
+					}else{
+						
+						$string = "VRR #{$late['VRR_ID']} \\nNotes: {$late['Notes']}  \\n{$late['User_Note']}";
+						echo "<script>alert(\"$string\")</script>";
+						$_SESSION['notif']=1;
+						$_SESSION['notifID']=$late['VRR_ID'];
+						$_SESSION['notifNote']=$late['Note_ID'];
+					}
+				}
+			}else{
+				
+				if($_SESSION['Accounttype']=="Manager")
+					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Checking' and User_Account='Manager'  order by Note_ID DESC Limit 1");
+				else
+					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Checking' and User_Account='Secretary' order by Note_ID DESC Limit 1");
+				// echo $Latest;
+				while($late = mysqli_fetch_array($Latest))
+				{	
+					$string = "VRR #{$late['VRR_ID']} \\nNotes: {$late['Notes']}  \\n{$late['User_Note']}";
+					echo "<script>alert(\"$string\")</script>";
+					$_SESSION['notif']=1;
+					$_SESSION['notifID']=$late['VRR_ID'];
+					$_SESSION['notifNote']=$late['Note_ID'];
+				}
+			}
+
 			$reservedquery=mysqli_query($con,"SELECT * FROM vehicle_database WHERE Status='Reserved'");
 			$reservedtotal=mysqli_num_rows($reservedquery);
 			$reservequery=mysqli_query($con,"SELECT * FROM vehicle_database WHERE Status='For Rent'");
