@@ -228,7 +228,7 @@ elseif(isset($_POST['viewHome']))
 			$cartotal = 0;
 			include 'data.php';
 			if(isset($_SESSION['notifVRRDone']) && !empty($_SESSION['notifVRRDone'])) {
-				$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='Repair Checked'order by Note_ID DESC Limit 1");
+				$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Closed'order by Note_ID DESC Limit 1");
 				// echo $Latest;
 				while($late = mysqli_fetch_array($Latest))
 				{	
@@ -252,7 +252,7 @@ elseif(isset($_POST['viewHome']))
 					}
 				}
 			}else{
-				$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='Repair Checked' order by Note_ID DESC Limit 1");
+				$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Closed' order by Note_ID DESC Limit 1");
 				// echo $Latest;
 				while($late = mysqli_fetch_array($Latest))
 				{	

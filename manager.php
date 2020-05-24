@@ -671,7 +671,7 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 			include 'data.php';
 			if(isset($_SESSION['notifVRRDone']) && !empty($_SESSION['notifVRRDone'])) {
 				if($_SESSION['Accounttype']=="Manager")
-					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='Repair Checked'order by Note_ID DESC Limit 1");
+					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Closed'order by Note_ID DESC Limit 1");
 				else
 					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Checking' and User_Account='Secretary' order by Note_ID DESC Limit 1");
 				// echo $Latest;
@@ -699,7 +699,7 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 			}else{
 				
 				if($_SESSION['Accounttype']=="Manager")
-					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='Repair Checked' order by Note_ID DESC Limit 1");
+					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Closed' order by Note_ID DESC Limit 1");
 				else
 					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Checking' and User_Account='Secretary' order by Note_ID DESC Limit 1");
 				// echo $Latest;

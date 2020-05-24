@@ -162,6 +162,15 @@ elseif(isset($_POST['submit_addQuotation'])){
 	$dateToday = date("Y-m-d");
 	$timeToday = date("h:i:sa");
 	include "data.php";
+	// echo "INSERT INTO quotation_database VALUES 
+	// (NULL,
+	// (SELECT Affiliates_ID FROM affiliates_database where affiliate_user = ".$_SESSION['UserID']."),
+	// '". $_POST['addQuotPlate'] ."',
+	// '". $_POST['addQuotDesc'] ."',
+	// '". $_POST['addQuotAmount']  ."',	
+	// '0',
+	// 'pending',
+	// now(),'". $_POST['addQuotVRR']  ."','',0)";
 	$newNote = mysqli_query($con,"INSERT INTO quotation_database VALUES 
 	(NULL,
 	(SELECT Affiliates_ID FROM affiliates_database where affiliate_user = ".$_SESSION['UserID']."),
@@ -170,7 +179,7 @@ elseif(isset($_POST['submit_addQuotation'])){
 	'". $_POST['addQuotAmount']  ."',	
 	'0',
 	'pending',
-	now(),'". $_POST['addQuotVRR']  ."','')");
+	now(),'". $_POST['addQuotVRR']  ."','',0)");
 	echo "<script>alert('Quotation Added.');window.location.href='affiliate.php';</script>";
 }
 elseif(isset($_POST['submit_resendQuotation'])){

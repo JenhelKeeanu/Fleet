@@ -79,7 +79,7 @@ while($viewVRRdetails = mysqli_fetch_array($showVRRdetails))
 							elseif($viewVRRdetails['Status']!="Affiliate Repair"&&$viewVRRdetails['Status']!='Repair Checking') echo "<option value='returnTicket'>Return Ticket</option>";
 							echo "<option value='changeStatus'>Change Status</option>";
 						}
-						elseif($viewVRRdetails['VRR_Type']!="" and $viewVRRdetails['VRR_Concern']!="" and $_SESSION['Accounttype']=="Quality Controller" and $viewVRRdetails['User_Account']=="Quality Controller")
+						elseif($viewVRRdetails['Status']!='Repair Ongoing' && $viewVRRdetails['VRR_Type']!="" and $viewVRRdetails['VRR_Concern']!="" and $_SESSION['Accounttype']=="Quality Controller" and $viewVRRdetails['User_Account']=="Quality Controller")
 						{
 								echo "<option value='forwardTicket'>Forward Ticket</option>";
 						}
@@ -90,6 +90,8 @@ while($viewVRRdetails = mysqli_fetch_array($showVRRdetails))
 							<option value='returnTicket'>Return Ticket</option>";
 						}elseif($viewVRRdetails['Status']=='Repair Checking' && $_SESSION['Accounttype']=="Quality Controller"){
 							echo "<option value='forwardTicket'>Return Repair Ticket</option>";
+							echo "<option value='ticketSolved'>Ticket Solved</option>";
+						}elseif($viewVRRdetails['Status']=='Repair Ongoing' && $_SESSION['Accounttype']=="Quality Controller"){
 							echo "<option value='ticketSolved'>Ticket Solved</option>";
 						}
 					}

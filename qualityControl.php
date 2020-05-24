@@ -110,11 +110,11 @@ elseif(isset($_POST['btnticketSolved']))
 	$dateToday = date("Y-m-d");
 	$timeToday = date("h:i:sa");
 	include "data.php";
-	if($_SESSION['vrrStatus']=="Repair Checking")
+	if($_SESSION['vrrStatus']=="Repair Checking"||$_SESSION['vrrStatus']=="Repair Ongoing")
 	{
 		$userUpdate = mysqli_query($con,"UPDATE vrr_database SET 
 		User_Account = 'Dispatcher',
-		Status='Repair Checked' WHERE VRR_ID='". $_SESSION['vrrNo'] ."'");
+		Status='VRR Closed' WHERE VRR_ID='". $_SESSION['vrrNo'] ."'");
 		$newNote = mysqli_query($con,"INSERT INTO vrrnotes_database
 		(VRR_ID,
 		Note_Type,
