@@ -1,6 +1,7 @@
 <?php
 session_start();
-if(isset($_POST['viewLog'])) echo "<script>window.location.href='affiliate.php?page=1';</script>";
+
+if(isset($_POST['viewLog'])) echo "<script>window.location.href='secretary.php?page=1';</script>";
 elseif(isset($_POST['saveAffiliate']))
 {
 	include "data.php";
@@ -9,34 +10,31 @@ elseif(isset($_POST['saveAffiliate']))
 	if($nAfind>0) echo "<script>alert('Record not saved. Account already exist in database.');</script>";
 	else
 	{
-		$addArecord = mysqli_query($con,"INSERT INTO affiliates_database (Affiliates_Name,Branch) VALUES ('". $_POST['addAname'] ."','". $_POST['addAbranch'] ."')");
-		echo "<script>alert('Account successfully saved.');window.location.href='affiliate.php?affil=1';</script>";
+		
+		if (mysqli_query($con, "INSERT INTO users_database (Username,Password,First_Name,Middle_Name,Last_Name,Contact_No,Birthday,Account_Type,Email,Address) VALUES ('". $_POST['addAuser'] ."','". $_POST['addAuser'] ."',' ',' ',' ','". $_POST['addAcontact'] ."',now(),'Affiliate','". $_POST['addAemail'] ."','". $_POST['addAaddress'] ."')")) {
+			$last_id = mysqli_insert_id($con);
+			$addArecord = mysqli_query($con, "INSERT INTO affiliates_database (Affiliates_Name,Branch,affiliate_user) VALUES ('". $_POST['addAname'] ."','". $_POST['addAbranch'] ."',". $last_id .")");
+			echo "<script>alert('Account successfully saved.');window.location.href='secretary.php?affil=1';</script>";
+		} else {
+		}
 	}
 }
-elseif(isset($_POST['fixed_vrr']))
+elseif(isset($_POST['quotationStat']))
 {
-	include "data.php";
 	$dateToday = date("Y-m-d");
 	$timeToday = date("h:i:sa");
-	$affilUpdate = mysqli_query($con,"UPDATE vrr_database SET 
-	Status = 'Repair Checking' WHERE VRR_ID='". $_POST['vrr_id'] ."'");
-	$newNote = mysqli_query($con,"INSERT INTO vrrnotes_database
-	(VRR_ID,
-	Note_Type,
-	Notes,
-	User_Note,
-	Assigned_Affil,
-	Note_date,
-	Note_Time) VALUES 
-	('". $_POST['vrr_id'] ."',
-	' Fixed Vehicle',
-	'Vehicle Fixed',
-	'By: ". $_SESSION['Fullname'] ."',
-	'',
-	'". $dateToday ."',
-	'". $timeToday ."')");
-	echo "<script>alert('Fixed Notification Sent.');window.location.href='affiliate.php';</script>";
-
+	include "data.php";
+	if($_POST['quotationStat']=='approve'){
+		$status="approved-manager";
+		$mess="Quotation Approved, Sent to Billing for cheque number";
+	}
+	else{
+		$status="declined";
+		$mess="Quotation Declined";
+	}
+	$affilUpdate = mysqli_query($con,"UPDATE quotation_database SET 
+	quot_status = '". $status ."' WHERE quot_id=". $_POST['ids'] ."");
+	echo "<script>alert('{$mess}');window.location.href='secretary.php?vrrDetails';</script>";
 }
 elseif(isset($_POST['updateAffil']))
 {
@@ -62,7 +60,7 @@ elseif(isset($_POST['updateAffil']))
 	'". $_POST['affilList'] ."(". $_POST['branchList'] .")',
 	'". $dateToday ."',
 	'". $timeToday ."')");
-	echo "<script>alert('Ticket assigned to affiliate.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+	echo "<script>alert('Ticket assigned to affiliate.');window.location.href='secretary.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 }
 elseif(isset($_POST['updateQC']))
 {
@@ -85,7 +83,7 @@ elseif(isset($_POST['updateQC']))
 	'By: ". $_SESSION['Fullname'] ."',
 	'". $dateToday ."',
 	'". $timeToday ."')");
-	echo "<script>alert('Ticket assigned to QC Department.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+	echo "<script>alert('Ticket assigned to QC Department.');window.location.href='secretary.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 }
 elseif(isset($_POST['noteSave']))
 {
@@ -105,7 +103,7 @@ elseif(isset($_POST['noteSave']))
 	'By: ". $_SESSION['Fullname'] ."',
 	'". $dateToday ."',
 	'". $timeToday ."')");
-	echo "<script>alert('Additional note has been added.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+	echo "<script>alert('Additional note has been added.');window.location.href='secretary.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 }
 elseif(isset($_POST['userSave']))
 {
@@ -131,7 +129,7 @@ elseif(isset($_POST['userSave']))
 		'Quality Controller',
 		'". $dateToday ."',
 		'". $timeToday ."')");
-		echo "<script>alert('Additional note has been added.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+		echo "<script>alert('Additional note has been added.');window.location.href='secretary.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 	}
 	elseif($_SESSION['Accounttype']=="Secretary")
 	{
@@ -155,35 +153,8 @@ elseif(isset($_POST['userSave']))
 		'Manager',
 		'". $dateToday ."',
 		'". $timeToday ."')");
-		echo "<script>alert('Additional note has been added.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+		echo "<script>alert('Additional note has been added.');window.location.href='secretary.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 	}
-}
-elseif(isset($_POST['submit_addQuotation'])){
-	$dateToday = date("Y-m-d");
-	$timeToday = date("h:i:sa");
-	include "data.php";
-	$newNote = mysqli_query($con,"INSERT INTO quotation_database VALUES 
-	(NULL,
-	(SELECT Affiliates_ID FROM affiliates_database where affiliate_user = ".$_SESSION['UserID']."),
-	'". $_POST['addQuotPlate'] ."',
-	'". $_POST['addQuotDesc'] ."',
-	'". $_POST['addQuotAmount']  ."',	
-	'0',
-	'pending',
-	now(),'". $_POST['addQuotVRR']  ."','')");
-	echo "<script>alert('Quotation Added.');window.location.href='affiliate.php';</script>";
-}
-elseif(isset($_POST['submit_resendQuotation'])){
-	$dateToday = date("Y-m-d");
-	$timeToday = date("h:i:sa");
-	include "data.php";
-	$newNote = mysqli_query($con,"UPDATE quotation_database SET 
-	quot_description = '".$_POST['addQuotDesc']."',
-	quot_amount = '". $_POST['addQuotAmount']  ."',
-	quot_status= 'pending',
-	quot_createDate = now()
-	where quot_id=". $_POST['addQuotID']  ."");
-	echo "<script>alert('Quotation Resend.');window.location.href='affiliate.php';</script>";
 }
 elseif(isset($_POST['returnSave']))
 {
@@ -215,7 +186,7 @@ elseif(isset($_POST['returnSave']))
 	'Quality Controller',
 	'". $dateToday ."',
 	'". $timeToday ."')");
-	echo "<script>alert('Ticket returned to Quality Control.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+	echo "<script>alert('Ticket returned to Quality Control.');window.location.href='secretary.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 }
 elseif(isset($_POST['statusSave']))
 {
@@ -241,7 +212,7 @@ elseif(isset($_POST['statusSave']))
 			'By: ". $_SESSION['Fullname'] ."',
 			'". $dateToday ."',
 			'". $timeToday ."')");
-			echo "<script>alert('Ticket has been cancelled.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+			echo "<script>alert('Ticket has been cancelled.');window.location.href='secretary.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 		}
 		elseif($_POST['statusChoice']=="Repair Checking")
 		{
@@ -264,7 +235,7 @@ elseif(isset($_POST['statusSave']))
 			'Quality Controller',
 			'". $dateToday ."',
 			'". $timeToday ."')");
-			echo "<script>alert('Ticket forwarded to Quality Control.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+			echo "<script>alert('Ticket forwarded to Quality Control.');window.location.href='secretary.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 		}
 		elseif($_POST['statusChoice']=="For Rent")
 		{
@@ -284,7 +255,7 @@ elseif(isset($_POST['statusSave']))
 			'By: ". $_SESSION['Fullname'] ."',
 			'". $dateToday ."',
 			'". $timeToday ."')");
-			echo "<script>alert('Ticket forwarded to dispatching department.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+			echo "<script>alert('Ticket forwarded to dispatching department.');window.location.href='secretary.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 		}
 	}
 }
@@ -308,7 +279,7 @@ if(isset($_POST['openSave']))
 	'By: ". $_SESSION['Fullname'] ."',
 	'". $dateToday ."',
 	'". $timeToday ."')");
-	echo "<script>alert('Ticket has been opened.');window.location.href='affiliate.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+	echo "<script>alert('Ticket has been opened.');window.location.href='secretary.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 
 }
 if(isset($_SESSION['security']))
@@ -321,19 +292,19 @@ if(isset($_SESSION['security']))
 elseif(!isset($_SESSION['security'])) echo "<script>window.location.href='index.php';</script>";
 if(isset($_POST['backV']))
 {
-	echo "<script>window.location.href='affiliate.php?vehicle=1';</script>";
+	echo "<script>window.location.href='secretary.php?vehicle=1';</script>";
 }
 elseif(isset($_POST['backU']))
 {
-	echo "<script>window.location.href='affiliate.php?users=1';</script>";
+	echo "<script>window.location.href='secretary.php?users=1';</script>";
 }
 elseif(isset($_POST['backA']))
 {
-	echo "<script>window.location.href='affiliate.php?affil=1';</script>";
+	echo "<script>window.location.href='secretary.php?affil=1';</script>";
 }
 elseif(isset($_POST['backD']))
 {
-	echo "<script>window.location.href='affiliate.php?vrr=1';</script>";
+	echo "<script>window.location.href='secretary.php?vrr=1';</script>";
 }
 elseif(isset($_POST['newVehicle']))
 {
@@ -347,7 +318,7 @@ elseif(isset($_POST['newVehicle']))
 	$N=mysqli_num_rows($Q);
 	if($N>0)
 	{
-		echo "<script>alert('Plate Number is already taken!');window.location.href='affiliate.php?vehicle=1';</script>";
+		echo "<script>alert('Plate Number is already taken!');window.location.href='secretary.php?vehicle=1';</script>";
 	} 
 	else
 	{
@@ -364,7 +335,7 @@ elseif(isset($_POST['newVehicle']))
 		'". $_POST['saveStatus'] ."',
 		'". $dateToday ."',
 		'". $dateEnd ."')");
-		echo "<script>alert('New car has been added to the database!');window.location.href='affiliate.php?vehicle=1';</script>";
+		echo "<script>alert('New car has been added to the database!');window.location.href='secretary.php?vehicle=1';</script>";
 	}
 }
 elseif(isset($_POST['saveAccount']))
@@ -399,7 +370,7 @@ elseif(isset($_POST['saveAccount']))
 			'". $_POST['saveType'] ."',
 			'". $_POST['saveEmail'] ."',
 			'". $_POST['saveAddress'] ."')");
-		echo "<script>alert('New account has been added.');window.location.href='affiliate.php?users=1';</script>";
+		echo "<script>alert('New account has been added.');window.location.href='secretary.php?users=1';</script>";
 	}
 }
 elseif(isset($_POST['saveU']))
@@ -422,7 +393,7 @@ elseif(isset($_POST['saveU']))
 			Account_Type='". $_POST['saveType'] ."',
 			Email='". $_POST['saveEmail'] ."',
 			Address='". $_POST['saveAddress'] ."' WHERE User_ID = '". $_GET['view'] ."'");
-			echo "<script>alert('User account updated successfully.');window.location.href='affiliate.php?users=1';</script>";
+			echo "<script>alert('User account updated successfully.');window.location.href='secretary.php?users=1';</script>";
 		}
 		else echo "<script>alert('Username already taken. Please choose another one.');</script>";
 	}
@@ -439,7 +410,7 @@ elseif(isset($_POST['saveU']))
 		Account_Type='". $_POST['saveType'] ."',
 		Email='". $_POST['saveEmail'] ."',
 		Address='". $_POST['saveAddress'] ."' WHERE User_ID = '". $_GET['view'] ."'");
-		echo "<script>alert('User account updated successfully.');window.location.href='affiliate.php?users=1';</script>";
+		echo "<script>alert('User account updated successfully.');window.location.href='secretary.php?users=1';</script>";
 	}
 }
 if(isset($_POST['updateAccount']))
@@ -522,7 +493,7 @@ elseif(isset($_POST['saveAffil']))
 		$updatedA = mysqli_query($con,"UPDATE affiliates_database SET
 		Affiliates_Name = '". $_POST['updateAname'] ."',
 		Branch = '". $_POST['updateAbranch'] ."' WHERE Affiliates_ID = '". $_GET['aview'] ."'");
-		echo "<script>alert('Affiliate record successfully updated.'); window.location.href='affiliate.php?affil=1';</script>";
+		echo "<script>alert('Affiliate record successfully updated.'); window.location.href='secretary.php?affil=1';</script>";
 	}
 }
 elseif(isset($_POST['saveVehicle']))
@@ -541,7 +512,7 @@ elseif(isset($_POST['saveVehicle']))
 			Status = '". $_POST['updateStatus'] ."',
 			PMS_Start = '". $_POST['updatePMSStart'] ."',
 			PMS_End = '". $_POST['updatePMSEnd'] ."' WHERE Vehicle_ID = '". $_GET['vview'] ."'");
-			echo "<script>alert('Car record successfully updated.');window.location.href='affiliate.php?vehicle=1';</script>";
+			echo "<script>alert('Car record successfully updated.');window.location.href='secretary.php?vehicle=1';</script>";
 		}
 		else echo "<script>alert('Plate number already taken.');</script>";
 	}
@@ -554,43 +525,42 @@ elseif(isset($_POST['saveVehicle']))
 		Status = '". $_POST['updateStatus'] ."',
 		PMS_Start = '". $_POST['updatePMSStart'] ."',
 		PMS_End = '". $_POST['updatePMSEnd'] ."' WHERE Vehicle_ID = '". $_GET['vview'] ."'");
-		echo "<script>alert('Car record successfully updated.');window.location.href='affiliate.php?vehicle=1';</script>";
+		echo "<script>alert('Car record successfully updated.');window.location.href='secretary.php?vehicle=1';</script>";
 	}
 }
 elseif(isset($_GET['deleteVRR']))
 {
 	include "data.php";
 	$deleteVRR = mysqli_query($con,"DELETE FROM vrr_database WHERE VRR_ID = '". $_GET['deleteVRR'] ."'");
-	echo "<script>alert('VRR record has been deleted.');window.location.href='affiliate.php?vrr=1';</script>";
+	echo "<script>alert('VRR record has been deleted.');window.location.href='secretary.php?vrr=1';</script>";
 }
 elseif(isset($_GET['deleteVehicle']))
 {
 	include "data.php";
 	$deleteVehicle = mysqli_query($con,"DELETE FROM vehicle_database WHERE Vehicle_ID = '". $_GET['deleteVehicle'] ."'");
-	echo "<script>alert('Car record has been deleted.');window.location.href='affiliate.php?vehicle=1';</script>";
+	echo "<script>alert('Car record has been deleted.');window.location.href='secretary.php?vehicle=1';</script>";
 }
 elseif(isset($_GET['deleteUser']))
 {
 	include "data.php";
 	$deleteUser = mysqli_query($con,"DELETE FROM users_database WHERE User_ID = '". $_GET['deleteUser'] ."'");
-	echo "<script>alert('User account has been deleted.');window.location.href='affiliate.php?users=1';</script>";
+	echo "<script>alert('User account has been deleted.');window.location.href='secretary.php?users=1';</script>";
 }
 elseif(isset($_GET['deleteAffil']))
 {
 	include "data.php";
 	$deleteAffil = mysqli_query($con,"DELETE FROM vrr_database WHERE VRR_ID = '". $_GET['deleteAffil'] ."'");
-	echo "<script>alert('Affiliate record has been deleted.');window.location.href='affiliate.php?affil=1';</script>";
+	echo "<script>alert('Affiliate record has been deleted.');window.location.href='secretary.php?affil=1';</script>";
 }
 elseif(isset($_POST['logout']))
 {
 	$_SESSION['security']=0;
-	session_destroy();
 	echo "<script>alert('Account successfully logged-out!');window.location.href='index.php';</script>";
 }
 elseif(isset($_POST['viewHome']))
 {
 	$_SESSION['updateCounter'] = 0;
-	echo "<script>window.location.href='affiliate.php';</script>";
+	echo "<script>window.location.href='secretary.php';</script>";
 }
 elseif(isset($_GET['vehicle']) or isset($_GET['vrr']) or isset($_GET['users'])) $_SESSION['updateCounter'] = 0;
 elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
@@ -598,16 +568,15 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Affiliate Account</title>
+	<title>Manager Account</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 	<link rel="stylesheet" href="//cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
 	<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
-	  
 </head>
 <style type="text/css">
 	<?php
@@ -617,15 +586,17 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 <body bgcolor="#d3d3d3" onload="PMS(), <?php if(isset($_GET['action'])) echo "modal()"; if(isset($_GET['notePage']) or isset($_GET['noteEnd'])) echo "note()";?>">
 	<form action="#" method="POST">
 		<div class="topnav">
-			<!-- <div class="dropdown">
+			<div class="dropdown">
 				<button class="dropbtn">View Database</button>
 				<div class="dropdown-content">
-					<a href="affiliate.php?vehicle=1">Cars</a>
-					<a href="affiliate.php?users=1">Users</a>
+					<a href="secretary.php?vehicle=1">Cars</a>
+					<a href="secretary.php?vrr=1">VRR</a>
+					<a href="secretary.php?users=1">Users</a>
+					<a href="secretary.php?viewQuotation">Quotation </a>
 				</div>
-			</div> -->
+			</div>
 			
-			<!-- <button class="dropbtn" name="viewReports">Reports</button> -->
+			<button class="dropbtn" name="viewReports">Reports</button>
 			<!-- <div class="dropdown">
 				<button class="dropbtn">Reports</button>
 				<div class="dropdown-content">
@@ -634,11 +605,8 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 					<a href="">User Report</a>
 				</div>
 			</div> -->
-			<a	class="dropbtn a-drop"  href="affiliate.php?viewVRR">VRR </a>
-			<!-- <a	class="dropbtn a-drop"  href="affiliate.php?viewQuotation">Quotation </a> -->
-			<!-- <button class="dropbtn" name="viewVRR">VRR</button> -->
+			<button class="dropbtn" name="viewAffiliates">Affiliates</button>
 			<button class="dropbtn" name="viewAccount">Account</button>
-			<a	class="dropbtn a-drop"  href="affiliate.php?viewQuotation">Quotation </a>
 			<?php
 			if($_SESSION['Accounttype']=="Manager") echo "<button class='dropbtn' name='viewLog'>Logs</button>";
 			?>
@@ -656,37 +624,11 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 		<div style="padding-top: 50px;">
 			<?php
 			include 'data.php';
-			if(isset($_SESSION['notifret']) && !empty($_SESSION['notifret'])) {
-				$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='Repair Return' order by Note_ID DESC Limit 1");
-				// echo $Latest;
-				while($late = mysqli_fetch_array($Latest))
-				{	
-					if($_SESSION['notifretID']==$late['VRR_ID']&&$_SESSION['notifretNote']==$late['Note_ID']){
-
-					}else{
-						
-						$string = "VRR #{$late['VRR_ID']} \\nNotes: {$late['Notes']}  \\n{$late['User_Note']}";
-						echo "<script>alert(\"$string\")</script>";
-						$_SESSION['notifret']=1;
-						$_SESSION['notifretID']=$late['VRR_ID'];
-						$_SESSION['notifretNote']=$late['Note_ID'];
-					}
-				}
-			}else{
-				
-				$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='Repair Return' order by Note_ID DESC Limit 1");
-				// echo $Latest;
-				while($late = mysqli_fetch_array($Latest))
-				{	
-					$string = "VRR #{$late['VRR_ID']} \\nNotes: {$late['Notes']}  \\n{$late['User_Note']}";
-					echo "<script>alert(\"$string\")</script>";
-					$_SESSION['notifret']=1;
-					$_SESSION['notifretID']=$late['VRR_ID'];
-					$_SESSION['notifretNote']=$late['Note_ID'];
-				}
-			}
 			if(isset($_SESSION['notif']) && !empty($_SESSION['notif'])) {
-				$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='Affiliate Repair' order by Note_ID DESC Limit 1");
+				if($_SESSION['Accounttype']=="Manager")
+					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Checking' and User_Account='Manager' order by Note_ID DESC Limit 1");
+				else
+					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Checking' and User_Account='Secretary' order by Note_ID DESC Limit 1");
 				// echo $Latest;
 				while($late = mysqli_fetch_array($Latest))
 				{	
@@ -703,7 +645,10 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 				}
 			}else{
 				
-				$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='Affiliate Repair' order by Note_ID DESC Limit 1");
+				if($_SESSION['Accounttype']=="Manager")
+					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Checking' and User_Account='Manager'  order by Note_ID DESC Limit 1");
+				else
+					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Checking' and User_Account='Secretary' order by Note_ID DESC Limit 1");
 				// echo $Latest;
 				while($late = mysqli_fetch_array($Latest))
 				{	
@@ -714,57 +659,7 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 					$_SESSION['notifNote']=$late['Note_ID'];
 				}
 			}
-			if(isset($_SESSION['notifQuot']) && !empty($_SESSION['notifQuot'])) {
-				$Latest=mysqli_query($con,"select * from quotation_database 
-                join affiliates_database on quotation_database.affiliate_id=affiliates_database.Affiliates_ID 
-                where quot_status not in ('pending') and affiliate_user='".$_SESSION['UserID']."' order by quot_updateDate DESC Limit 1");
-				while($late = mysqli_fetch_array($Latest))
-				{	
-					if($late['quot_notif']!=1){
-						if($_SESSION['notifQuotID']==$late['quot_id']&&$_SESSION['notifQuotDate']==$late['quot_updateDate']){
 
-						}else{
-							if($late['quot_status']=='approved-manager')
-								$status='Approved by the manager waiting for cheque number';
-							elseif($late['quot_status']=='approved-paid'){
-								$userUpdate = mysqli_query($con,"UPDATE quotation_database SET 
-								quot_notif = 1 WHERE quot_id='". $late['quot_id'] ."'");
-								$status='Cheque Number sent';
-							}
-							elseif($late['quot_status']=='declined')
-								$status='Declined by the manager';
-							$string = "QUOT #{$late['quot_id']} FOR VRR #{$late['quote_vrr']}\\nStatus: {$status}  \\n Date Updated: {$late['quot_updateDate']}";
-							echo "<script>alert(\"$string\")</script>";
-							$_SESSION['notifQuot']=1;
-							$_SESSION['notifQuotID']=$late['quot_id'];
-							$_SESSION['notifQuotDate']=$late['quot_updateDate'];
-						}
-					}
-				}
-			}else{
-				$Latest=mysqli_query($con,"select * from quotation_database 
-                join affiliates_database on quotation_database.affiliate_id=affiliates_database.Affiliates_ID 
-                where quot_status not in ('pending') and affiliate_user='".$_SESSION['UserID']."' order by quot_updateDate DESC Limit 1");
-				while($late = mysqli_fetch_array($Latest))
-				{	
-					if($late['quot_notif']!=1){
-						if($late['quot_status']=='approved-manager')
-							$status='Approved by the manager waiting for cheque number';
-						elseif($late['quot_status']=='approved-paid'){
-							$userUpdate = mysqli_query($con,"UPDATE quotation_database SET 
-							quot_notif = 1 WHERE quot_id='". $late['quot_id'] ."'");
-							$status='Cheque Number sent';
-						}
-						elseif($late['quot_status']=='declined')
-							$status='Declined by the manager';
-						$string = "QUOT #{$late['quot_id']} FOR VRR #{$late['quote_vrr']}\\Status: {$status}  \\ Date Updated: {$late['quot_updateDate']}";
-						echo "<script>alert(\"$string\")</script>";
-						$_SESSION['notifQuot']=1;
-						$_SESSION['notifQuotID']=$late['quot_id'];
-						$_SESSION['notifQuotDate']=$late['quot_updateDate'];
-					}
-				}
-			}
 			$reservedquery=mysqli_query($con,"SELECT * FROM vehicle_database WHERE Status='Reserved'");
 			$reservedtotal=mysqli_num_rows($reservedquery);
 			$reservequery=mysqli_query($con,"SELECT * FROM vehicle_database WHERE Status='For Rent'");
@@ -777,21 +672,10 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 			$userstotal=mysqli_num_rows($usersquery);
 			$affilquery=mysqli_query($con,'SELECT * FROM affiliates_database');
 			$affiltotal=mysqli_num_rows($affilquery);
-			// echo 'SELECT * FROM vrr_database where Status="Pending" and Affiliates=(SELECT Affiliates_Name from affiliates_database where affiliate_user='.$_SESSION['UserID'].') and Branch=(SELECT Branch from affiliates_database where affiliate_user='.$_SESSION['UserID'].') ';
-			$vrrquery=mysqli_query($con,'SELECT * FROM vrr_database where Status="Affiliate Repair" and Affiliates=(SELECT Affiliates_Name from affiliates_database where affiliate_user='.$_SESSION['UserID'].') and Branch=(SELECT Branch from affiliates_database where affiliate_user='.$_SESSION['UserID'].') ');
+			$vrrquery=mysqli_query($con,'SELECT * FROM vrr_database');
 			$vrrtotal=mysqli_num_rows($vrrquery);
-
-			$vrrquery=mysqli_query($con,'SELECT * FROM vrr_database where Status="Repair Return" and Affiliates=(SELECT Affiliates_Name from affiliates_database where affiliate_user='.$_SESSION['UserID'].') and Branch=(SELECT Branch from affiliates_database where affiliate_user='.$_SESSION['UserID'].') ');
-			$vrrReturn=mysqli_num_rows($vrrquery);
-
-			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where affiliate_user='.$_SESSION['UserID'].'');
+			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database where quot_status="Pending"');
 			$quotAll=mysqli_num_rows($vrrquery);
-			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where quot_status="pending" and affiliate_user='.$_SESSION['UserID'].'');
-			$quotPending=mysqli_num_rows($vrrquery);
-			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where quot_status not in ("pending","decline") and affiliate_user='.$_SESSION['UserID'].'');
-			$quotApproved=mysqli_num_rows($vrrquery);
-			$vrrquery=mysqli_query($con,'SELECT * FROM quotation_database qd join affiliates_database ad on qd.affiliate_id=ad.Affiliates_ID where quot_status="declined" and affiliate_user='.$_SESSION['UserID'].'');
-			$quotDeclined=mysqli_num_rows($vrrquery);
 			if($_SESSION['Accounttype']=="Manager")
 			{
 				$vrrpending=mysqli_query($con,"SELECT * FROM vrr_database WHERE User_Account = 'Manager'");
@@ -812,11 +696,11 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 			}
 			elseif(isset($_POST['viewQuotation']) or isset($_GET['viewQuotation']))
 			{
-				include "quotation.php";
+				include "quotationsecretary.php";
 			}
-			elseif(isset($_POST['viewVRR']) or isset($_GET['viewVRR']))
+			elseif(isset($_POST['viewAffiliates']) or isset($_GET['affil']))
 			{
-				include "vrr.php";
+				include "affiliatesDatabase.php";
 			}
 			elseif(isset($_POST['viewReports']) or isset($_GET['affil']))
 			{
@@ -829,31 +713,37 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 					<tr>
 						<td style="border-top-left-radius: 20px; border-bottom-left-radius: 20px; border-right: 2px solid black;">
 							<table style="border-collapse: collapse;" cellpadding="10" cellspacing="10">
-                                <tr>
-                                    <td bgcolor="white"><b>Pending Quotation:</b> <a href="affiliate.php?viewQuotation=Pending">'.$quotPending.'</a></td>
-                                </tr>
-                                <tr>
-                                    <td bgcolor="white"><b>Approved Quotation:</b> <a href="affiliate.php?viewQuotation=Approved">'.$quotApproved.'</a></td>
-                                </tr>
-                                <tr>
-                                    <td bgcolor="white"><b>Declined Quotation:</b> <a href="affiliate.php?viewQuotation=Declined">'.$quotDeclined.'</a></td>
-                                </tr>
+								<tr>
+									<td bgcolor="white"><b>Total Number of Cars for Reservation:</b> <a href="secretary.php?vehicle=reserve">'.$reservetotal.'</a></td>
+								</tr>
+								<tr>
+									<td bgcolor="white"><b>Total Number of VRR Tickets:</b> <a href="secretary.php?vrr=total">'.$vrrtotal.'</a></td>
+								</tr>
+								<tr>
+									<td bgcolor="white"><b>Total Number of Cars Reserved:</b> <a href="secretary.php?vehicle=reserved">'.$reservedtotal.'</a></td>
+								</tr>
+								<tr>
+									<td bgcolor="white"><b>Total Number of Cars Under Repair:</b> <a href="secretary.php?vehicle=repair">'.$repairtotal.'</a></td>
+								</tr>
 							</table>
 						</td>
 						<td bgcolor="white" style="border-right: 2px solid black;">
 							<table style="border-collapse: collapse;" cellpadding="10" cellspacing="10">
 								<tr>
-									<td bgcolor="white"><b>Total Number of Quotation:</b> <a href="affiliate.php?viewQuotation">'.$quotAll.'</a></td>
+									<td bgcolor="white"><b>Total Number of User Accounts:</b> <a href="secretary.php?users=total">'.$userstotal.'</a></td>
 								</tr>
-                                <tr>
-                                    <td bgcolor="white"><b>VRR Received:</b> <a href="affiliate.php?viewVRR">'.$vrrtotal.'</a></td>
-                                </tr>
-                                <tr>
-                                    <td bgcolor="white"><b>Cars Repaired:</b> <a href="affiliate.php?vehicle=reserved">'.$reservedtotal.'</a></td>
-                                </tr>
-                                <tr>
-                                    <td bgcolor="white"><b>VRR Returned for Repaired:</b> <a href="affiliate.php?viewVRR">'.$vrrReturn.'</a></td>
-                                </tr>
+								<tr>
+									<td bgcolor="white"><b>Total Number of Affiliates:</b> <a href="secretary.php?affil=total">'.$affiltotal.'</a></td>
+								</tr>
+								<tr>
+									<td bgcolor="white"><b>Total Number of Owned Cars:</b> <a href="secretary.php?vehicle=owned">'.$vehicletotal.'</a></td>
+								</tr>
+								<tr>
+									<td bgcolor="white"><b>Pending Tickets:</b> <a href="secretary.php?vrr=pending">'.$pendingtotal.'</a></td>
+								</tr>
+								<tr>
+									<td bgcolor="white"><b>Pending Quotation:</b> <a href="secretary.php?viewQuotation=Pending">'.$quotAll.'</a></td>
+								</tr>
 							</table>
 						</td>
 						<td bgcolor="white" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px;">

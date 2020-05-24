@@ -1,7 +1,8 @@
 <div id="test" >
     <center>
         <div class="m-5 col-8 m-5 p-5">
-            <div class=" float-right">
+            <div style="font-weight:bold;font-size:22px">
+                VRR Received
             </div>
             <table width="100%" class="table table-bordered" id="QuotationTable">
                 <thead>
@@ -27,7 +28,9 @@
                 <tbody>
                     <?php
                         // echo 'SELECT *,(select quot_id from quotation_database where quote_vrr=qd.VRR_ID) as QUOT FROM vrr_database qd join vehicle_database vd on qd.Plate_No=vd.Vehicle_Plate where qd.Status="Affiliate Repair" and qd.Affiliates=(SELECT Affiliates_Name from affiliates_database where affiliate_user='.$_SESSION['UserID'].') and Branch=(SELECT Branch from affiliates_database where affiliate_user='.$_SESSION['UserID'].') ';
-                        $vrrRep=mysqli_query($con,'SELECT *,(select quot_id from quotation_database where quote_vrr=qd.VRR_ID and quot_status in ("approved-manager","approved-paid")) as QUOT FROM vrr_database qd join vehicle_database vd on qd.Plate_No=vd.Vehicle_Plate where qd.Status="Affiliate Repair" and qd.Affiliates=(SELECT Affiliates_Name from affiliates_database where affiliate_user='.$_SESSION['UserID'].') and Branch=(SELECT Branch from affiliates_database where affiliate_user='.$_SESSION['UserID'].') ');
+                        $vrrRep=mysqli_query($con,'SELECT *,(select quot_id from quotation_database where quote_vrr=qd.VRR_ID) as QUOT
+                        ,(select quot_status from quotation_database where quote_vrr=qd.VRR_ID) as quot_status
+                         FROM vrr_database qd join vehicle_database vd on qd.Plate_No=vd.Vehicle_Plate where qd.Status="Affiliate Repair" and qd.Affiliates=(SELECT Affiliates_Name from affiliates_database where affiliate_user='.$_SESSION['UserID'].') and Branch=(SELECT Branch from affiliates_database where affiliate_user='.$_SESSION['UserID'].') ');
                         
                         while($vrr = mysqli_fetch_array($vrrRep))
                         {
@@ -46,12 +49,92 @@
                             </td>
                             <td>{$vrr['ODO']}
                             </td>
-                            <td>{$vrr['QUOT']}";
+                            <td style='vertical-align: middle;'>";
                             if($vrr['QUOT']==null)
-                            echo "<button class='btn btn-secondary mb-3 btn_addQuotation' value='{$vrr['VRR_ID']}' data-ct='{$vrr['Car_Type']}' data-cb='{$vrr['Car_Brand']}' data-pt='{$vrr['Vehicle_ID']}'>ADD QUOTATION
+                            echo "<button class='btn btn-secondary btn_addQuotation' value='{$vrr['VRR_ID']}' data-ct='{$vrr['Car_Type']}' data-cb='{$vrr['Car_Brand']}' data-pt='{$vrr['Vehicle_ID']}'>ADD QUOTATION
                             </button>";
-                            else
-                            echo "<p style='color:green'>Quotation Sent</p>";
+                            else{
+                                if($vrr['quot_status']=="approved-paid"){
+                                    
+                                    echo "<form method='post'><input type='hidden' name='vrr_id' value='{$vrr['VRR_ID']}'> <button name='fixed_vrr' class='btn btn-outline-success ' value='{$vrr['VRR_ID']}' data-ct='{$vrr['Car_Type']}' data-cb='{$vrr['Car_Brand']}' data-pt='{$vrr['Vehicle_ID']}'>FIXED
+                                    </button></form>";
+                                }else
+                                echo "<p style='color:green'>Quotation Sent</p>";
+                            }
+                            echo "</td>
+                            </tr>";
+                        }
+                    ?>
+                </tbody>
+            </table>
+            <div style="font-weight:bold;font-size:22px" id="returnVRRH">
+                Returned VRR
+            </div>
+            <table width="100%" class="table table-bordered" id="returnVRR">
+                <thead>
+                    <tr>
+                        <th>VRR No.
+                        </th>
+                        <th>Type
+                        </th>
+                        <th>Concern
+                        </th>
+                        <th>Return Reason
+                        </th>
+                        <th>Car Brand
+                        </th>
+                        <th>Car Model
+                        </th>
+                        <th>Plate Number
+                        </th>
+                        <th>ODO
+                        </th>
+                        <th>Action
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                        // echo 'SELECT *,(select quot_id from quotation_database where quote_vrr=qd.VRR_ID) as QUOT FROM vrr_database qd join vehicle_database vd on qd.Plate_No=vd.Vehicle_Plate where qd.Status="Affiliate Repair" and qd.Affiliates=(SELECT Affiliates_Name from affiliates_database where affiliate_user='.$_SESSION['UserID'].') and Branch=(SELECT Branch from affiliates_database where affiliate_user='.$_SESSION['UserID'].') ';
+                        $vrrRep=mysqli_query($con,'SELECT *,
+                        (select quot_id from quotation_database where quote_vrr=qd.VRR_ID) as QUOT,
+                        (select quot_status from quotation_database where quote_vrr=qd.VRR_ID) as quot_status,
+                        (select Notes from vrrnotes_database where VRR_ID=qd.VRR_ID order by Note_ID DESC Limit 1) as Notes
+                         FROM vrr_database qd 
+                         join vehicle_database vd on qd.Plate_No=vd.Vehicle_Plate 
+                         where qd.Status="Repair Return" and qd.Affiliates=(SELECT Affiliates_Name from affiliates_database where affiliate_user='.$_SESSION['UserID'].') and Branch=(SELECT Branch from affiliates_database where affiliate_user='.$_SESSION['UserID'].') ');
+                        
+                        while($vrr = mysqli_fetch_array($vrrRep))
+                        {
+                            echo "<tr>
+                            <td>{$vrr['VRR_ID']}
+                            </td>
+                            <td>{$vrr['VRR_Type']}
+                            </td>
+                            <td>{$vrr['VRR_Concern']}
+                            </td>
+                            <td>{$vrr['Notes']}
+                            </td>
+                            <td>{$vrr['Car_Brand']}
+                            </td>
+                            <td>{$vrr['Car_Type']}
+                            </td>
+                            <td>{$vrr['Plate_No']}
+                            </td>
+                            <td>{$vrr['ODO']}
+                            </td>
+                            <td style='vertical-align: middle;'>";
+                            if($vrr['QUOT']==null)
+                            echo "<button class='btn btn-secondary btn_addQuotation' value='{$vrr['VRR_ID']}' data-ct='{$vrr['Car_Type']}' data-cb='{$vrr['Car_Brand']}' data-pt='{$vrr['Vehicle_ID']}'>ADD QUOTATION
+                            </button>";
+                            else{
+                                if($vrr['quot_status']=="approved-paid"){
+                                    
+                                    echo "<form method='post'><input type='hidden' name='vrr_id' value='{$vrr['VRR_ID']}'> <button name='fixed_vrr' class='btn btn-outline-success ' value='{$vrr['VRR_ID']}' data-ct='{$vrr['Car_Type']}' data-cb='{$vrr['Car_Brand']}' data-pt='{$vrr['Vehicle_ID']}'>FIXED
+                                    </button></form>";
+                                }else
+                                echo "<p style='color:green'>Quotation Sent</p>";
+                            }
                             echo "</td>
                             </tr>";
                         }
@@ -59,6 +142,16 @@
                 </tbody>
             </table>
         </div>
+            <?php
+                $vrrquery=mysqli_query($con,'SELECT * FROM vrr_database where Status="Repair Return" and Affiliates=(SELECT Affiliates_Name from affiliates_database where affiliate_user='.$_SESSION['UserID'].') and Branch=(SELECT Branch from affiliates_database where affiliate_user='.$_SESSION['UserID'].') ');
+                $vrrReturn=mysqli_num_rows($vrrquery);
+                if($vrrReturn==0){
+                    echo "<script>
+                    $('#returnVRRH').css('display','none');
+                    $('#returnVRR').css('display','none');
+                    </script>";
+                }
+            ?>
     </center>
     <div id="txtHint" class="m-5 col-8 m-5 p-5">
     </div>

@@ -14,7 +14,7 @@ if(isset($_POST['alogin']))
       $dateToday = date("Y-m-d");
       $timeToday = date("h:i:sa");
       echo "<script>alert('Welcome user {$R['Last_Name']},{$R['First_Name']} {$R['Middle_Name']}');</script>";
-      if($R['Account_Type']=="Manager" or $R['Account_Type']=="Secretary")
+      if($R['Account_Type']=="Manager")
       {
         $_SESSION['vrrNo'] = "0";
         $_SESSION['UserID']=$R['User_ID'];
@@ -35,6 +35,29 @@ if(isset($_POST['alogin']))
         $_SESSION['security']=1;
         echo "<script>window.location.href='manager.php';</script>";
         mysqli_close();
+      }
+      elseif($R['Account_Type']=="Secretary")
+      {
+        $_SESSION['vrrNo'] = "0";
+        $_SESSION['UserID']=$R['User_ID'];
+        $_SESSION['Accounttype']=$R['Account_Type'];
+        $_SESSION['Contact']=$R['Contact_No'];
+        $_SESSION['Email']=$R['Email'];
+        $_SESSION['Fullname']=$R['Last_Name'].", ".$R['First_Name']." ".$R['Middle_Name'];
+        $_SESSION['updateCounter'] = 0;
+        $pmsCount = mysqli_query($con,"SELECT * FROM vehicle_database WHERE PMS_End = '". $dateToday ."'");
+        $_SESSION['PMS'] = mysqli_num_rows($pmsCount);
+        $log = mysqli_query($con,"INSERT INTO log_database 
+        (Log_User,
+        Log_Date,
+        Log_Time) VALUE 
+        ('". $_SESSION['Fullname'] ."',
+        '". $dateToday ."',
+        '". $timeToday ."')");
+        $_SESSION['security']=1;
+        echo "<script>window.location.href='secretary.php';</script>";
+        mysqli_close();
+
       }
       elseif($R['Account_Type']=="Dispatcher")
       {

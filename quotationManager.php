@@ -66,14 +66,17 @@
                             <td onclick=showVRR('{$showPlate['quot_id']}','{$showPlate['VRR_Type']}','{$showPlate['VRR_Date']}','{$showPlate['VRR_Concern']}','{$showPlate['ODO']}')>{$showPlate['quot_createDate']}
                             </td>
                             <td>";
-                            if($status=='pending')
-                                echo "<form action='#' method='POST' class='btn-group-vertical' style='margin:0'>
-                                        <input type='hidden' value='{$showPlate['quot_id']}' name='ids'>
-                                        <button name='quotationStat' class='btn btn-success approve' value='approve'>Approve</button>
-                                        <button name='quotationStat' class='btn btn-danger' value='decline'>Decline</button>
-                                    </form>";
-                            if($status=='Approved - Unpaid')
-                                echo "<button id='cheque' class='btn btn-info approve' value='{$showPlate['quot_id']}'>Send Cheque Number</button>";
+                            if($_SESSION['Accounttype']=="Manager"){
+                                if($status=='pending')
+                                    echo "<form action='#' method='POST' class='btn-group-vertical' style='margin:0'>
+                                            <input type='hidden' value='{$showPlate['quot_id']}' name='ids'>
+                                            <button name='quotationStat' class='btn btn-success approve' value='approve'>Approve</button>
+                                            <button name='quotationStat' class='btn btn-danger' value='decline'>Decline</button>
+                                        </form>";
+                            }elseif($_SESSION['Accounttype']=="Billing"){
+                                if($status=='Approved - Unpaid')
+                                    echo "<button id='cheque' class='btn btn-info approve' value='{$showPlate['quot_id']}'>Send Cheque Number</button>";
+                            }
                             echo "</td>
                                 </tr>";
                         }
@@ -99,7 +102,7 @@
                     <input type="hidden" id="ids" name="ids">
                     <input type="text" class="form-control" name="chequeNum" required placeholder="Cheque Number" aria-label="Cheque Number" aria-describedby="button-addon2">
                     <div class="input-group-append">
-                        <button class="btn btn-outline-success" type="submit" name="save_cheque" id="button-addon2">Button</button>
+                        <button class="btn btn-outline-success" type="submit" name="save_cheque" id="button-addon2">Send Cheque</button>
                     </div>
                 </div>
             </div>

@@ -180,6 +180,7 @@ elseif(isset($_POST['saveVehicle']))
 elseif(isset($_POST['logout']))
 {
 	$_SESSION['security']=0;
+	session_destroy();
 	echo "<script>alert('Account successfully logged-out!');window.location.href='index.php';</script>";
 }
 elseif(isset($_POST['viewHome']))
@@ -226,6 +227,51 @@ elseif(isset($_POST['viewHome']))
 				echo date("Y-m-d H:i:s", strtotime('+5 hours'));
 			$cartotal = 0;
 			include 'data.php';
+			if(isset($_SESSION['notifVRRDone']) && !empty($_SESSION['notifVRRDone'])) {
+				$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='Repair Checked'order by Note_ID DESC Limit 1");
+				// echo $Latest;
+				while($late = mysqli_fetch_array($Latest))
+				{	
+					if($late['notif']!=2&&$late['notif']!=3){
+						if($_SESSION['notifVRRDoneID']==$late['VRR_ID']&&$_SESSION['notifVRRDoneNote']==$late['Note_ID']){
+
+						}else{
+							
+							$string = "VRR #{$late['VRR_ID']} \\nNotes: {$late['Notes']}  \\n{$late['User_Note']}";
+							echo "<script>alert(\"$string\")</script>";
+							$_SESSION['notifVRRDone']=1;
+							$_SESSION['notifVRRDoneID']=$late['VRR_ID'];
+							$_SESSION['notifVRRDoneNote']=$late['Note_ID'];
+							$updateNotif=2;
+							if($late['notif']==1){
+								$updateNotif=3;
+							}
+							$userUpdate = mysqli_query($con,"UPDATE vrr_database SET 
+							notif = {$updateNotif} WHERE VRR_ID='". $late['VRR_ID'] ."'");
+						}
+					}
+				}
+			}else{
+				$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='Repair Checked' order by Note_ID DESC Limit 1");
+				// echo $Latest;
+				while($late = mysqli_fetch_array($Latest))
+				{	
+					if($late['notif']!=2&&$late['notif']!=3){
+						$string = "VRR #{$late['VRR_ID']} \\nNotes: {$late['Notes']}  \\n{$late['User_Note']}";
+						echo "<script>alert(\"$string\")</script>";
+						$_SESSION['notifVRRDone']=1;
+						$_SESSION['notifVRRDoneID']=$late['VRR_ID'];
+						$_SESSION['notifVRRDoneNote']=$late['Note_ID'];
+						$updateNotif=2;
+						if($late['notif']==1){
+							$updateNotif=3;
+						}
+						$userUpdate = mysqli_query($con,"UPDATE vrr_database SET 
+						notif = {$updateNotif} WHERE VRR_ID='". $late['VRR_ID'] ."'");
+						
+					}
+				}
+			}
 			$reservedquery=mysqli_query($con,"SELECT * FROM vehicle_database WHERE Status='Reserved'");
 			$reservedtotal=mysqli_num_rows($reservedquery);
 			$reservequery=mysqli_query($con,"SELECT * FROM vehicle_database WHERE Status='For Rent'");

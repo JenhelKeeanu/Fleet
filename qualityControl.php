@@ -105,6 +105,42 @@ elseif(isset($_POST['updateAccount']))
 		$_SESSION['updateCounter'] = 1;
 	}
 }
+elseif(isset($_POST['btnticketSolved']))
+{
+	$dateToday = date("Y-m-d");
+	$timeToday = date("h:i:sa");
+	include "data.php";
+	if($_SESSION['vrrStatus']=="Repair Checking")
+	{
+		$userUpdate = mysqli_query($con,"UPDATE vrr_database SET 
+		User_Account = 'Dispatcher',
+		Status='Repair Checked' WHERE VRR_ID='". $_SESSION['vrrNo'] ."'");
+		$newNote = mysqli_query($con,"INSERT INTO vrrnotes_database
+		(VRR_ID,
+		Note_Type,
+		Notes,
+		User_Note,
+		Change_User,
+		Note_date,
+		Note_Time) VALUES 
+		('". $_SESSION['vrrNo'] ."',
+		'Change Account',
+		'". $_POST['userNotes'] ."',
+		'By: ". $_SESSION['Fullname'] ."',	
+		'Manager',
+		'". $dateToday ."',
+		'". $timeToday ."')");
+		$statusData = mysqli_query($con,"SELECT * FROM vrr_database WHERE VRR_ID = '". $_SESSION['vrrNo'] ."'");
+		while($showData = mysqli_fetch_array($statusData))
+		{
+			$updatedV = mysqli_query($con,"UPDATE vehicle_database SET 
+			Status='For Rent' WHERE Vehicle_Plate = '{$showData['Plate_No']}'");
+			echo "<script>alert('Vehicle & VRR updates sent to manager and dispatcher');window.location.href='qualityControl.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+		}
+		
+	
+	}
+}
 elseif(isset($_POST['userSave']))
 {
 	$dateToday = date("Y-m-d");
@@ -239,6 +275,8 @@ elseif(isset($_POST['noteSave']))
 			$vehicletotal=mysqli_num_rows($vehiclequery);
 			$vrrpending=mysqli_query($con,"SELECT * FROM vrr_database WHERE User_Account = 'Quality Controller'");
 			$vrrtotal = mysqli_num_rows($vrrpending);
+			$vrrpending=mysqli_query($con,"SELECT * FROM vrr_database WHERE Status = 'Repair Checking'");
+			$vrrChecking = mysqli_num_rows($vrrpending);
 			if(isset($_POST['viewAccount']) or isset($_POST['editAccount']) or $_SESSION['updateCounter'] == 1)
 			{
 				include "accountDetails.php";
@@ -268,6 +306,9 @@ elseif(isset($_POST['noteSave']))
 								</tr>
 								<tr>
 									<td bgcolor="white"><b>Pending Tickets:</b> <a href="qualityControl.php?vrr=pending">'.$vrrtotal.'</a></td>
+								</tr>
+								<tr>
+									<td bgcolor="white"><b>VRR Fixed (to be check):</b> <a href="qualityControl.php?vrr=RepairChecking">'.$vrrChecking.'</a></td>
 								</tr>
 							</table>
 						</td>

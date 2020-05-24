@@ -33,8 +33,9 @@ elseif(isset($_POST['quotationStat']))
 		$mess="Quotation Declined";
 	}
 	$affilUpdate = mysqli_query($con,"UPDATE quotation_database SET 
-	quot_status = '". $status ."' WHERE quot_id=". $_POST['ids'] ."");
-	echo "<script>alert('{$mess}');window.location.href='manager.php?vrrDetails';</script>";
+	quot_status = '". $status ."',
+	quot_updateDate = now() WHERE quot_id=". $_POST['ids'] ."");
+	echo "<script>alert('{$mess}');window.location.href='manager.php?viewQuotation';</script>";
 }
 elseif(isset($_POST['updateAffil']))
 {
@@ -161,32 +162,75 @@ elseif(isset($_POST['returnSave']))
 	$dateToday = date("Y-m-d");
 	$timeToday = date("h:i:sa");
 	include "data.php";
+
+	$statusData = mysqli_query($con,"SELECT * FROM vrr_database WHERE VRR_ID = '". $_SESSION['vrrNo'] ."'");
+	while($showData = mysqli_fetch_array($statusData))
+	{
+		$_SESSION['vrrStatus']=$showData['Status'];
+	}
 	if($_SESSION['vrrStatus']=="Repair Ongoing")
 	{
 		$userUpdate = mysqli_query($con,"UPDATE vrr_database SET 
 		User_Account = 'Quality Controller' WHERE VRR_ID='". $_SESSION['vrrNo'] ."'");
+		$newNote = mysqli_query($con,"INSERT INTO vrrnotes_database
+		(VRR_ID,
+		Note_Type,
+		Notes,
+		User_Note,
+		Change_User,
+		Note_date,
+		Note_Time) VALUES 
+		('". $_SESSION['vrrNo'] ."',
+		'Return Account',
+		'". $_POST['userNotes'] ."',
+		'By: ". $_SESSION['Fullname'] ."',	
+		'Quality Controller',
+		'". $dateToday ."',
+		'". $timeToday ."')");
+		echo "<script>alert('Ticket returned to Quality Control.');window.location.href='manager.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 	}
 	elseif($_SESSION['vrrStatus']=="VRR Checking")
 	{
 		$userUpdate = mysqli_query($con,"UPDATE vrr_database SET 
 		User_Account = 'Quality Controller', Status = 'Pending' WHERE VRR_ID='". $_SESSION['vrrNo'] ."'");
+		$newNote = mysqli_query($con,"INSERT INTO vrrnotes_database
+		(VRR_ID,
+		Note_Type,
+		Notes,
+		User_Note,
+		Change_User,
+		Note_date,
+		Note_Time) VALUES 
+		('". $_SESSION['vrrNo'] ."',
+		'Return Account',
+		'". $_POST['userNotes'] ."',
+		'By: ". $_SESSION['Fullname'] ."',	
+		'Quality Controller',
+		'". $dateToday ."',
+		'". $timeToday ."')");
+		echo "<script>alert('Ticket returned to Quality Control.');window.location.href='manager.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
 	}
-	$newNote = mysqli_query($con,"INSERT INTO vrrnotes_database
-	(VRR_ID,
-	Note_Type,
-	Notes,
-	User_Note,
-	Change_User,
-	Note_date,
-	Note_Time) VALUES 
-	('". $_SESSION['vrrNo'] ."',
-	'Return Account',
-	'". $_POST['userNotes'] ."',
-	'By: ". $_SESSION['Fullname'] ."',	
-	'Quality Controller',
-	'". $dateToday ."',
-	'". $timeToday ."')");
-	echo "<script>alert('Ticket returned to Quality Control.');window.location.href='manager.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+	elseif($_SESSION['vrrStatus']=="Repair Checking")
+	{
+		$userUpdate = mysqli_query($con,"UPDATE vrr_database SET 
+		Status = 'Repair Return' WHERE VRR_ID='". $_SESSION['vrrNo'] ."'");
+		$newNote = mysqli_query($con,"INSERT INTO vrrnotes_database
+		(VRR_ID,
+		Note_Type,
+		Notes,
+		User_Note,
+		Change_User,
+		Note_date,
+		Note_Time) VALUES 
+		('". $_SESSION['vrrNo'] ."',
+		'Return Account',
+		'". $_POST['userNotes'] ."',
+		'By: ". $_SESSION['Fullname'] ."',	
+		'Manager',
+		'". $dateToday ."',
+		'". $timeToday ."')");
+		echo "<script>alert('Ticket returned to Affiliate.');window.location.href='manager.php?vrrDetails={$_SESSION['vrrNo']}';</script>";
+	}
 }
 elseif(isset($_POST['statusSave']))
 {
@@ -555,6 +599,7 @@ elseif(isset($_GET['deleteAffil']))
 elseif(isset($_POST['logout']))
 {
 	$_SESSION['security']=0;
+	session_destroy();
 	echo "<script>alert('Account successfully logged-out!');window.location.href='index.php';</script>";
 }
 elseif(isset($_POST['viewHome']))
@@ -624,29 +669,81 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 		<div style="padding-top: 50px;">
 			<?php
 			include 'data.php';
-			if(isset($_SESSION['notif']) && !empty($_SESSION['notif'])) {
+			if(isset($_SESSION['notifVRRDone']) && !empty($_SESSION['notifVRRDone'])) {
 				if($_SESSION['Accounttype']=="Manager")
-					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Checking' and User_Account='Manager' order by Note_ID DESC Limit 1");
+					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='Repair Checked'order by Note_ID DESC Limit 1");
 				else
 					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Checking' and User_Account='Secretary' order by Note_ID DESC Limit 1");
 				// echo $Latest;
 				while($late = mysqli_fetch_array($Latest))
 				{	
-					if($_SESSION['notifID']==$late['VRR_ID']&&$_SESSION['notifNote']==$late['Note_ID']){
+					if($late['notif']!=1&&$late['notif']!=3){
+						if($_SESSION['notifVRRDoneID']==$late['VRR_ID']&&$_SESSION['notifVRRDoneNote']==$late['Note_ID']){
 
-					}else{
-						
-						$string = "VRR #{$late['VRR_ID']} \\nNotes: {$late['Notes']}  \\n{$late['User_Note']}";
-						echo "<script>alert(\"$string\")</script>";
-						$_SESSION['notif']=1;
-						$_SESSION['notifID']=$late['VRR_ID'];
-						$_SESSION['notifNote']=$late['Note_ID'];
+						}else{
+							
+							$string = "VRR #{$late['VRR_ID']} \\nNotes: {$late['Notes']}  \\n{$late['User_Note']}";
+							echo "<script>alert(\"$string\")</script>";
+							$_SESSION['notifVRRDone']=1;
+							$_SESSION['notifVRRDoneID']=$late['VRR_ID'];
+							$_SESSION['notifVRRDoneNote']=$late['Note_ID'];
+							$updateNotif=1;
+							if($late['notif']==2){
+								$updateNotif=3;
+							}
+							$userUpdate = mysqli_query($con,"UPDATE vrr_database SET 
+							notif = {$updateNotif} WHERE VRR_ID='". $late['VRR_ID'] ."'");
+						}
 					}
 				}
 			}else{
 				
 				if($_SESSION['Accounttype']=="Manager")
-					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Checking' and User_Account='Manager'  order by Note_ID DESC Limit 1");
+					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='Repair Checked' order by Note_ID DESC Limit 1");
+				else
+					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Checking' and User_Account='Secretary' order by Note_ID DESC Limit 1");
+				// echo $Latest;
+				while($late = mysqli_fetch_array($Latest))
+				{	
+					if($late['notif']!=1&&$late['notif']!=3){
+						$string = "VRR #{$late['VRR_ID']} \\nNotes: {$late['Notes']}  \\n{$late['User_Note']}";
+						echo "<script>alert(\"$string\")</script>";
+						$_SESSION['notifVRRDone']=1;
+						$_SESSION['notifVRRDoneID']=$late['VRR_ID'];
+						$_SESSION['notifVRRDoneNote']=$late['Note_ID'];
+						$updateNotif=1;
+						if($late['notif']==2){
+							$updateNotif=3;
+						}
+						$userUpdate = mysqli_query($con,"UPDATE vrr_database SET 
+						notif = {$updateNotif} WHERE VRR_ID='". $late['VRR_ID'] ."'");
+						
+					}
+				}
+			}
+			if(isset($_SESSION['notifVRR']) && !empty($_SESSION['notifVRR'])) {
+				if($_SESSION['Accounttype']=="Manager")
+					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status in ('VRR Checking', 'Repair Checking') and User_Account='Manager' order by Note_ID DESC Limit 1");
+				else
+					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Checking' and User_Account='Secretary' order by Note_ID DESC Limit 1");
+				// echo $Latest;
+				while($late = mysqli_fetch_array($Latest))
+				{	
+					if($_SESSION['notifVRRID']==$late['VRR_ID']&&$_SESSION['notifVRRNote']==$late['Note_ID']){
+
+					}else{
+						
+						$string = "VRR #{$late['VRR_ID']} \\nNotes: {$late['Notes']}  \\n{$late['User_Note']}";
+						echo "<script>alert(\"$string\")</script>";
+						$_SESSION['notifVRR']=1;
+						$_SESSION['notifVRRID']=$late['VRR_ID'];
+						$_SESSION['notifVRRNote']=$late['Note_ID'];
+					}
+				}
+			}else{
+				
+				if($_SESSION['Accounttype']=="Manager")
+					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status in ('VRR Checking', 'Repair Checking') and User_Account='Manager'  order by Note_ID DESC Limit 1");
 				else
 					$Latest=mysqli_query($con,"select * from vrr_database vrd join vrrnotes_database vd on vd.VRR_ID=vrd.VRR_ID where Status='VRR Checking' and User_Account='Secretary' order by Note_ID DESC Limit 1");
 				// echo $Latest;
@@ -654,9 +751,41 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 				{	
 					$string = "VRR #{$late['VRR_ID']} \\nNotes: {$late['Notes']}  \\n{$late['User_Note']}";
 					echo "<script>alert(\"$string\")</script>";
-					$_SESSION['notif']=1;
-					$_SESSION['notifID']=$late['VRR_ID'];
-					$_SESSION['notifNote']=$late['Note_ID'];
+					$_SESSION['notifVRR']=1;
+					$_SESSION['notifVRRID']=$late['VRR_ID'];
+					$_SESSION['notifVRRNote']=$late['Note_ID'];
+				}
+			}
+			if(isset($_SESSION['notifQuot']) && !empty($_SESSION['notifQuot'])) {
+				$Latest=mysqli_query($con,"select * from quotation_database 
+				join affiliates_database on quotation_database.affiliate_id=affiliates_database.Affiliates_ID 
+				join users_database on users_database.User_ID=affiliates_database.affiliate_user
+				where quot_status='pending' order by quot_createDate DESC Limit 1");
+				while($late = mysqli_fetch_array($Latest))
+				{	
+					if($_SESSION['notifQuotID']==$late['quot_id']&&$_SESSION['notifQuotDate']==$late['quot_createDate']){
+
+					}else{
+						
+						$string = "QUOT #{$late['quot_id']} FOR VRR #{$late['quote_vrr']}\\nNotes: {$late['quot_description']}  \\n by: {$late['Last_Name']},{$late['First_Name']} {$late['Middle_Name']} ({$late['Affiliates_Name']}-{$late['Branch']}) \\n Amount: {$late['quot_amount']}";
+						echo "<script>alert(\"$string\")</script>";
+						$_SESSION['notifQuot']=1;
+						$_SESSION['notifQuotID']=$late['quot_id'];
+						$_SESSION['notifQuotDate']=$late['quot_createDate'];
+					}
+				}
+			}else{
+				$Latest=mysqli_query($con,"select * from quotation_database 
+				join affiliates_database on quotation_database.affiliate_id=affiliates_database.Affiliates_ID 
+				join users_database on users_database.User_ID=affiliates_database.affiliate_user
+				where quot_status='pending' order by quot_createDate DESC Limit 1");
+				while($late = mysqli_fetch_array($Latest))
+				{	
+					$string = "QUOT #{$late['quot_id']} FOR VRR #{$late['quote_vrr']}\\nNotes: {$late['quot_description']}  \\n by: {$late['Last_Name']},{$late['First_Name']} {$late['Middle_Name']} ({$late['Affiliates_Name']}-{$late['Branch']}) \\n Amount: {$late['quot_amount']}";
+					echo "<script>alert(\"$string\")</script>";
+					$_SESSION['notifQuot']=1;
+					$_SESSION['notifQuotID']=$late['quot_id'];
+					$_SESSION['notifQuotDate']=$late['quot_createDate'];
 				}
 			}
 

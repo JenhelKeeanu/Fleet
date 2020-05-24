@@ -75,19 +75,22 @@ while($viewVRRdetails = mysqli_fetch_array($showVRRdetails))
 						<option value='addNote'>Add Note</option>";
 						if($_SESSION['Accounttype']=="Manager" and $viewVRRdetails['User_Account']=="Manager")
 						{
-							if($viewVRRdetails['Status']!="Affiliate Repair") echo "<option value='returnTicket'>Return Ticket</option>";
+							if($viewVRRdetails['Status']=='Repair Checking') echo "<option value='returnTicket'>Return Repair Ticket</option>";
+							elseif($viewVRRdetails['Status']!="Affiliate Repair"&&$viewVRRdetails['Status']!='Repair Checking') echo "<option value='returnTicket'>Return Ticket</option>";
 							echo "<option value='changeStatus'>Change Status</option>";
 						}
 						elseif($viewVRRdetails['VRR_Type']!="" and $viewVRRdetails['VRR_Concern']!="" and $_SESSION['Accounttype']=="Quality Controller" and $viewVRRdetails['User_Account']=="Quality Controller")
 						{
-							echo "
-							<option value='forwardTicket'>Forward Ticket</option>";
+								echo "<option value='forwardTicket'>Forward Ticket</option>";
 						}
 						elseif($_SESSION['Accounttype']=="Secretary" and $viewVRRdetails['User_Account']=="Secretary")
 						{
 							echo "
 							<option value='forwardTicket'>Forward Ticket</option>
 							<option value='returnTicket'>Return Ticket</option>";
+						}elseif($viewVRRdetails['Status']=='Repair Checking' && $_SESSION['Accounttype']=="Quality Controller"){
+							echo "<option value='forwardTicket'>Return Repair Ticket</option>";
+							echo "<option value='ticketSolved'>Ticket Solved</option>";
 						}
 					}
 					else
@@ -432,13 +435,54 @@ while($viewVRRdetails = mysqli_fetch_array($showVRRdetails))
 				</form>";
 			}
 		}
-		elseif($_GET['action']=="returnTicket")
+		elseif($_GET['action']=="ticketSolved")
 		{
 			echo "
 			<form action='#' method='POST'>
 				<table cellpadding='5' cellspacing='10' width='40%' border='0' bgcolor='white' style='margin: 15px; border-radius: 20px;'>
 					<tr>
-						<td bgcolor='white' colspan='2'><b>Return to Quality Control</b></td>
+						<td bgcolor='white' colspan='2'><b>";
+						include "data.php";
+						$statusData = mysqli_query($con,"SELECT * FROM vrr_database WHERE VRR_ID = '". $_SESSION['vrrNo'] ."'");
+						while($showData = mysqli_fetch_array($statusData))
+						{
+							$_SESSION['vrrStatus'] = $showData['Status'];
+							if($showData['Status']=="Pending") echo "Forward to Secretary";
+							elseif($showData['Status']=="VRR Checking") echo "Forward to Manager";
+							elseif($showData['Status']=="Repair Ongoing") echo "Forward to Manager";
+							elseif($showData['Status']=="Repair Checking") echo "Forward To Dispatcher";
+						}
+						echo "
+						</b></td>
+					</tr>
+					<tr>
+						<td bgcolor='white' colspan='2'><b>Note: </b></td>
+					</tr>
+					<tr>
+						<td bgcolor='white' colspan='2'><textarea style='width: 100%;' name='userNotes' required></textarea></td>
+					</tr>
+					<tr>
+						<td bgcolor='white'><input type='submit' class='button button5' name='btnticketSolved' value='Save Changes'></td>
+					</tr>
+				</table>
+			</form>";
+		}
+		elseif($_GET['action']=="returnTicket")
+		{
+			echo "
+			<form action='#' method='POST'>
+				<table cellpadding='5' cellspacing='10' width='40%' border='0' bgcolor='white' style='margin: 15px; border-radius: 20px;'>
+					<tr>";
+					include "data.php";
+					$statusData = mysqli_query($con,"SELECT * FROM vrr_database WHERE VRR_ID = '". $_SESSION['vrrNo'] ."'");
+					while($showData = mysqli_fetch_array($statusData))
+					{
+						if($showData['Status']=="VRR Checking")
+						echo"	<td bgcolor='white' colspan='2'><b>Return to Quality Control</b></td>";
+						elseif($showData['Status']=="Repair Checking")
+						echo"	<td bgcolor='white' colspan='2'><b>Return to Affiliate</b></td>";
+					}
+					echo"
 					</tr>
 					<tr>
 						<td bgcolor='white' colspan='2'><b>Reason: </b></td>

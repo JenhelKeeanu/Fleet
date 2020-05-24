@@ -153,6 +153,27 @@
 				<input type='submit' name='vrrRecord' class='button button5' value='Search'>
 			</td>";
 		}
+		elseif($_GET['vrr']=="RepairChecking") 
+		{
+			echo "
+			<td width='15%' bgcolor='#d3d3d3'>
+				<select name='searchVstatus'>
+					<option>Pending</Option>
+					<option>VRR Checking</Option>
+					<option>Repair Ongoing</Option>
+					<option>Affiliates Repair</Option>
+					<option selected>Repair Checking</Option>
+					<option>Repair Done</Option>
+					<option>For Rent</Option>
+					<option>Ticked Voided</Option>
+					<option>Ticket Reopened</Option>
+				</select>
+			</td>
+			<td bgcolor='#d3d3d3'>
+				<input type='submit' name='vrrRecord' id='vrrRecord' class='button button5' value='Search'>
+			</td>";
+			echo "<script>$('#vrrsearch').val('vrrStatus');</script>";
+		}
 		?>
 		</form>
 		<?php
@@ -592,6 +613,91 @@ elseif($_GET['vrr']=="total")
 			<td align='center'>{$r['Status']}</td>
 			<td align='center'>{$r['Affiliates']}</td>
 		</tr>";
+	}
+	echo "
+	</table>";
+}
+elseif($_GET['vrr']=="RepairChecking")
+{
+	
+	echo "
+	<table width='70%' class='tableVehicle'>
+		<tr>
+			<td align='center' colspan='10' style='background: linear-gradient(to bottom, #ff8c00, red 100%);
+				border-top-left-radius: 15px;
+				border-top-right-radius: 15px;'>
+				<h2><b>VRR Database</b><h2>
+			</td>
+		</tr>
+		<tr style='background-color: #778899;'>
+			<td align='center'><b>VRR ID</b></td>
+			<td align='center'><b>VRR Type</b></td>
+			<td align='center'><b>VRR Date</b></td>
+			<td align='center'><b>Plate Number</b></td>
+			<td align='center'><b>Car Brand</b></td>
+			<td align='center'><b>Car Type</b></td>
+			<td align='center'><b>QC Name</b></td>
+			<td align='center'><b>Status</b></td>
+			<td align='center'><b>Affiliates</b></td>
+		</tr>";
+	include "data.php";
+	if($_SESSION['Accounttype']=="Quality Controller") 
+	{
+		$q=mysqli_query($con,"SELECT * FROM vrr_database WHERE Status='Repair Checking'");
+	}
+	while($r=mysqli_fetch_array($q))
+	{
+		if($_SESSION['Accounttype']!="Dispatcher")
+		{
+			$_SESSION['modalID'] = $r['VRR_ID'];
+			echo "
+			<tr>
+				<td align='center'><a ";
+				if($_SESSION['Accounttype']=="Manager") echo "href='manager.php?vrrDetails={$r['VRR_ID']}'";
+				elseif($_SESSION['Accounttype']=="Secretary") echo "href='manager.php?vrrDetails={$r['VRR_ID']}'";
+				elseif($_SESSION['Accounttype']=="Dispatcher") echo "href='dispatcher.php?vrrDetails={$r['VRR_ID']}'";
+				elseif($_SESSION['Accounttype']=="Quality Controller") echo "href='qualityControl.php?vrrDetails={$r['VRR_ID']}'";
+				echo  "
+				>{$r['VRR_ID']}</a></td>
+				<td align='center'>{$r['VRR_Type']}</td>
+				<td align='center'>{$r['VRR_Date']}</td>
+				<td align='center'>{$r['Plate_No']}</td>
+				<td align='center'>{$r['Car_Brand']}</td>
+				<td align='center'>{$r['Car_Type']}</td>
+				<td align='center'>{$r['User_Account']}</td>
+				<td align='center'>{$r['Status']}</td>
+				<td align='center'>{$r['Affiliates']}</td>
+			</tr>";
+		}
+		else
+		{
+			if($countPending>0)
+			{
+				$displayCar = mysqli_query($con,"SELECT * FROM vrr_database where Plate_No = '". $r['Vehicle_Plate'] ."' AND Status = 'Ticket Resolved'");
+				while($showQ = mysqli_fetch_array($displayCar))
+				{
+					$_SESSION['modalID'] = $showQ['VRR_ID'];
+					echo "
+					<tr>
+						<td align='center'><a ";
+						if($_SESSION['Accounttype']=="Manager") echo "href='manager.php?vrrDetails={$showQ['VRR_ID']}'";
+						elseif($_SESSION['Accounttype']=="Secretary") echo "href='manager.php?vrrDetails={$showQ['VRR_ID']}'";
+						elseif($_SESSION['Accounttype']=="Dispatcher") echo "href='dispatcher.php?vrrDetails={$showQ['VRR_ID']}'";
+						elseif($_SESSION['Accounttype']=="Quality Controller") echo "href='qualityControl.php?vrrDetails={$showQ['VRR_ID']}'";
+						echo  "
+						>{$showQ['VRR_ID']}</a></td>
+						<td align='center'>{$showQ['VRR_Type']}</td>
+						<td align='center'>{$showQ['VRR_Date']}</td>
+						<td align='center'>{$showQ['Plate_No']}</td>
+						<td align='center'>{$showQ['Car_Brand']}</td>
+						<td align='center'>{$showQ['Car_Type']}</td>
+						<td align='center'>{$showQ['User_Account']}</td>
+						<td align='center'>{$showQ['Status']}</td>
+						<td align='center'>{$showQ['Affiliates']}</td>
+					</tr>";						
+				}			
+			}
+		}
 	}
 	echo "
 	</table>";

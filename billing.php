@@ -17,7 +17,8 @@ elseif(isset($_POST['save_cheque'])){
 	include "data.php";
 	$affilUpdate = mysqli_query($con,"UPDATE quotation_database SET 
 	quot_status = 'approved-paid',
-    quot_cheque = '". $_POST['chequeNum'] ."' WHERE quot_id=". $_POST['ids'] ."");
+    quot_cheque = '". $_POST['chequeNum'] ."',
+	quot_updateDate = now() WHERE quot_id=". $_POST['ids'] ."");
 	echo "<script>alert('Cheque Sent');window.location.href='billing.php?viewQuotation';</script>";
 }
 elseif(isset($_POST['updateAffil']))
@@ -624,7 +625,40 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 	<center>	
 		<div style="padding-top: 50px;">
 			<?php
+			
 			include 'data.php';
+			if(isset($_SESSION['notifQuot']) && !empty($_SESSION['notifQuot'])) {
+				$Latest=mysqli_query($con,"select * from quotation_database 
+				join affiliates_database on quotation_database.affiliate_id=affiliates_database.Affiliates_ID 
+				join users_database on users_database.User_ID=affiliates_database.affiliate_user
+				where quot_status='approved-manager' order by quot_updateDate DESC Limit 1");
+				while($late = mysqli_fetch_array($Latest))
+				{	
+					if($_SESSION['notifQuotID']==$late['quot_id']&&$_SESSION['notifQuotDate']==$late['quot_updateDate']){
+
+					}else{
+						
+						$string = "QUOT #{$late['quot_id']} FOR VRR #{$late['quote_vrr']}\\nNotes: {$late['quot_description']}  \\n by: {$late['Last_Name']},{$late['First_Name']} {$late['Middle_Name']} ({$late['Affiliates_Name']}-{$late['Branch']}) \\n Amount: {$late['quot_amount']}";
+						echo "<script>alert(\"$string\")</script>";
+						$_SESSION['notifQuot']=1;
+						$_SESSION['notifQuotID']=$late['quot_id'];
+						$_SESSION['notifQuotDate']=$late['quot_updateDate'];
+					}
+				}
+			}else{
+				$Latest=mysqli_query($con,"select * from quotation_database 
+				join affiliates_database on quotation_database.affiliate_id=affiliates_database.Affiliates_ID 
+				join users_database on users_database.User_ID=affiliates_database.affiliate_user
+				where quot_status='approved-manager' order by quot_updateDate DESC Limit 1");
+				while($late = mysqli_fetch_array($Latest))
+				{	
+					$string = "QUOT #{$late['quot_id']} FOR VRR #{$late['quote_vrr']}\\nNotes: {$late['quot_description']}  \\n by: {$late['Last_Name']},{$late['First_Name']} {$late['Middle_Name']} ({$late['Affiliates_Name']}-{$late['Branch']}) \\n Amount: {$late['quot_amount']}";
+					echo "<script>alert(\"$string\")</script>";
+					$_SESSION['notifQuot']=1;
+					$_SESSION['notifQuotID']=$late['quot_id'];
+					$_SESSION['notifQuotDate']=$late['quot_updateDate'];
+				}
+			}
 			$reservedquery=mysqli_query($con,"SELECT * FROM vehicle_database WHERE Status='Reserved'");
 			$reservedtotal=mysqli_num_rows($reservedquery);
 			$reservequery=mysqli_query($con,"SELECT * FROM vehicle_database WHERE Status='For Rent'");
