@@ -623,7 +623,7 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 		include "styles.css";
 	?>
 </style>
-<body bgcolor="#d3d3d3" onload="PMS(), <?php if(isset($_GET['action'])) echo "modal()"; if(isset($_GET['notePage']) or isset($_GET['noteEnd'])) echo "note()";?>">
+<body style="background:#d3d3d3" onload="PMS(), <?php if(isset($_GET['action'])) echo "modal()"; if(isset($_GET['notePage']) or isset($_GET['noteEnd'])) echo "note()";?>">
 	<form action="#" method="POST">
 		<div class="topnav">
 			<!-- <div class="dropdown">
@@ -834,9 +834,9 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
 			elseif(!isset($_GET['vehicle']) and !isset($_GET['vrr']) and !isset($_GET['users']) and !isset($_GET['view']) and !isset($_GET['vview']) and !isset($_GET['aview']) and !isset($_GET['vrrDetails']) and !isset($_GET['action']) and !isset($_GET['page']) and !isset($_GET['notePage']) and !isset($_GET['noteEnd']))
 			{
 				echo '
-				<table width="60%" border="0" style="border-collapse: collapse; background-color: #00008b; border-radius: 20px;" cellpadding="5">
+				<table width="60%" border="0" style="border-collapse: collapse; border-radius: 20px;" cellpadding="5">
 					<tr>
-						<td style="border-top-left-radius: 20px; border-bottom-left-radius: 20px; border-right: 2px solid black;">
+						<td bgcolor="white" style="border-top-left-radius: 20px; border-bottom-left-radius: 20px; border-right: 2px solid black;">
 							<table style="border-collapse: collapse;" cellpadding="10" cellspacing="10">
                                 <tr>
                                     <td bgcolor="white"><b>Pending Quotation:</b> <a href="affiliate.php?viewQuotation=Pending">'.$quotPending.'</a></td>
@@ -865,19 +865,19 @@ elseif(isset($_POST['viewAffiliates'])) $_SESSION['updateCounter'] = 0;
                                 </tr>
 							</table>
 						</td>
-						<td bgcolor="white" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px;">
+						<td bgcolor="yellow" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px;">
 							<table style="border-collapse: collapse;" cellpadding="10" cellspacing="10">
 								<tr>
-									<td bgcolor="white"><b>Account Type:</b> <br>'.$_SESSION['Accounttype'].'</td>
+									<td bgcolor="yellow"><b>Account Type:</b> <br>'.$_SESSION['Accounttype'].'</td>
 								</tr>
 								<tr>
-									<td bgcolor="white"><b>Full Name:</b> <br>'.$_SESSION['Fullname'].'</td>
+									<td bgcolor="yellow"><b>Full Name:</b> <br>'.$_SESSION['Fullname'].'</td>
 								</tr>
 								<tr>
-									<td bgcolor="white"><b>Contact Number:</b> <br>'.$_SESSION['Contact'].'</td>
+									<td bgcolor="yellow"><b>Contact Number:</b> <br>'.$_SESSION['Contact'].'</td>
 								</tr>
 								<tr>
-									<td bgcolor="white"><b>E-mail:</b> <br>'.$_SESSION['Email'].'</td>
+									<td bgcolor="yellow"><b>E-mail:</b> <br>'.$_SESSION['Email'].'</td>
 								</tr>
 							</table>
 						</td>

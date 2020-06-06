@@ -312,19 +312,19 @@ elseif(isset($_POST['noteSave']))
 								</tr>
 							</table>
 						</td>
-						<td bgcolor="white" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px;">
+						<td bgcolor="yellow" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px;">
 							<table style="border-collapse: collapse;" cellpadding="10" cellspacing="10">
 								<tr>
-									<td bgcolor="white"><b>Account Type:</b> <br>'.$_SESSION['Accounttype'].'</td>
+									<td bgcolor="yellow"><b>Account Type:</b> <br>'.$_SESSION['Accounttype'].'</td>
 								</tr>
 								<tr>
-									<td bgcolor="white"><b>Full Name:</b> <br>'.$_SESSION['Fullname'].'</td>
+									<td bgcolor="yellow"><b>Full Name:</b> <br>'.$_SESSION['Fullname'].'</td>
 								</tr>
 								<tr>
-									<td bgcolor="white"><b>Contact Number:</b> <br>'.$_SESSION['Contact'].'</td>
+									<td bgcolor="yellow"><b>Contact Number:</b> <br>'.$_SESSION['Contact'].'</td>
 								</tr>
 								<tr>
-									<td bgcolor="white"><b>E-mail:</b> <br>'.$_SESSION['Email'].'</td>
+									<td bgcolor="yellow"><b>E-mail:</b> <br>'.$_SESSION['Email'].'</td>
 								</tr>
 							</table>
 						</td>
